@@ -1,0 +1,23 @@
+{
+  "name": "maptalks.esri",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maptalks/maptalks.esri.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/maptalks/maptalks.esri/issues"
+  },
+  "homepage": "https://github.com/maptalks/maptalks.esri#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "maptalks": "^0.35.1"
+  }
+}
