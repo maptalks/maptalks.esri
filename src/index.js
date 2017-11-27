@@ -1,4 +1,0 @@
-
-maptalks.esri={
-    
-}
