@@ -6,7 +6,7 @@ import ImageMapLayer from './Layers/ImageMapLayer';
 
 const esri = {
     ImageMapLayer : ImageMapLayer
-
+    
 }
 
 

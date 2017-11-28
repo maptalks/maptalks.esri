@@ -1,6 +1,7 @@
 import {cors} from './../Utils/Support';
 import cleanUrl from './../Utils/cleanUrl';
 import {AJAX} from 'maptalks';
+import Service from './Service';
 
 const options = {
     proxy:false,
@@ -8,10 +9,14 @@ const options = {
     timeout:0
 }
 
-export default class ImageService{
+export default class ImageService extends Service{
 
-    constructor(options){
+    query(){
 
+    }
+
+    identify(){
+        
     }
 
 }
