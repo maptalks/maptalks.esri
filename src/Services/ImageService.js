@@ -9,6 +9,9 @@ const options = {
     timeout:0
 }
 
+/**
+ * 提供query和identify操作
+ */
 export default class ImageService extends Service{
 
     query(){
