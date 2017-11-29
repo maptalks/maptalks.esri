@@ -2,8 +2,8 @@ import Task from './Task'
 
 class IdentifyTask extends Task{
 
-    constructor(){
-        super();
+    constructor(endpoint,params){
+        super(endpoint,params);
         this._path = 'identify'
     }
 

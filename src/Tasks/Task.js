@@ -1,7 +1,7 @@
 import { cors } from "../Utils/Support";
 import Service from "./../Services/Service";
 import merge from './../Utils/merge';
-import { AJAX } from 'maptalks';
+import { Ajax } from 'maptalks';
 
 /**
  * task是由serveice组成
@@ -21,10 +21,10 @@ class Task {
      * 创建一个task，可以是基于url或者是service创建
      * @param {Service} service 
      */
-    constructor(endpoint, options) {
-        this._service = service;
+    constructor(endpoint, options={}) {
+        this._service = endpoint;
         this._formatted = false;
-        this._params = params || {};
+        this._params = {};
     }
 
     /**
@@ -43,7 +43,7 @@ class Task {
     request(callback, context) {
         let params = merge({}, this._params);
         if (this._service)
-            return this._service.request(this.path, params, callback, context);
+            return this._service.request(this._path, params, callback, context);
         else
             return this._locRequest()
     }
@@ -52,11 +52,11 @@ class Task {
         let url = this._url;
         //4.根据method发出请求
         if ((method === 'GET' || method === 'REQUEST') && !this._options.useCors) {
-            return AJAX.jsonp(url + '?' + serializeParams(_params), (resp) => {
+            return Ajax.jsonp(url + '?' + serializeParams(_params), (resp) => {
                 !!context ? callback(resp) : callback.call(context, resp);
             });
         } else {
-            return AJAX.post(url, params, (resp) => {
+            return Ajax.post(url, params, (resp) => {
                 !!context ? callback(resp) : callback.call(context, resp);
             });
         }

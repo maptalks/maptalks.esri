@@ -1,7 +1,8 @@
 import {cors} from './../Utils/Support';
 import cleanUrl from './../Utils/cleanUrl';
-import {AJAX} from 'maptalks';
+import {Ajax} from 'maptalks';
 import Service from './Service';
+import IdentifyImageTask from './../Tasks/IdentifyImageTask';
 
 const options = {
     proxy:false,
@@ -10,16 +11,40 @@ const options = {
 }
 
 /**
- * 提供query和identify操作
+ * imageService对应arcgis发布的的supported operations
+ * -Export Image
+ * -Query
+ * -Identify
+ * -Coumpute Histograms
+ * -Get Samples
+ * -Compute Class Statistics
  */
 export default class ImageService extends Service{
+
+    GetSamples(){
+        
+    }
+
+    CouputeClassStatistics(){
+
+    }
+
+    ComputeHistograms(){
+
+    }
+
+    exportImage(){
+
+    }
 
     query(){
 
     }
-
+    /**
+     * 获取配置信息，用于设置加载位置等
+     */
     identify(){
-        
+        return new IdentifyImageTask(this);   
     }
 
 }

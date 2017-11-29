@@ -4,6 +4,8 @@
  */
 import * as maptalks from 'maptalks';
 
+import ImageService from './../Services/ImageService';
+
 const options={
     updateInterval:150,
     format:'jpgpng',
@@ -16,9 +18,17 @@ const options={
 export default class ImageMapLayer extends maptalks.Layer{
 
     constructor(id,options){
-
+        super(id,options);
+        this._url = options.url;
+        this._service = new ImageService(this._url);
+        this._identify();
     }
 
+    _identify(){
+        this._service.identify().run(function(resp){
+            var s ="";
+        },this);
+    }
 }
 
 

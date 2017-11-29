@@ -1,0 +1,41 @@
+<<!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Document</title>
+        <!-- maptalks -->
+        <link rel="stylesheet" href="./../node_modules/maptalks/dist/maptalks.css">
+        <script src="./../node_modules/maptalks/dist/maptalks.js"></script>
+        <!-- maptalks.esri -->
+        <script src="./../dist/maptalks.esri.js"></script>
+    </head>
+
+    <body>
+        <!--map document div-->
+        <div id='mapDiv' style="width:800px;height:600px;" class="container"> </div>
+        <script>
+            // default map object
+            var map = new maptalks.Map('mapDiv', {
+                center: [-0.113049, 51.498568],
+                zoom: 14,
+                attribution: {
+                    content: '&copy; <a href="http://osm.org">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/">CARTO</a>'
+                },
+                baseLayer: new maptalks.TileLayer('base', {
+                    urlTemplate: 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+                    subdomains: ['a', 'b', 'c', 'd']
+                })
+            });
+            //esri imagelayer
+            var imageLayer = new maptalks.esri.ImageMapLayer('imagemaplayer',{
+                url:'https://landsat.arcgis.com/arcgis/rest/services/Landsat/PS/ImageServer'
+            });
+            //
+            map.addLayer(imageLayer);
+        </script>
+    </body>
+
+    </html>

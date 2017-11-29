@@ -1,8 +1,8 @@
 
-import merge from './../../Utils/merge';
-import {cors} from './../../Utils/Support';
-import cleanUrl from './../../Utils/cleanUrl';
-import {AJAX} from 'maptalks';
+import merge from './../Utils/merge';
+import {cors} from './../Utils/Support';
+import cleanUrl from './../Utils/cleanUrl';
+import {Ajax} from 'maptalks';
 import serializeParams  from './../Utils/serializeParams';
 
 const _options={
@@ -61,12 +61,13 @@ class Service{
         //3.发出请求
         method = method.toUpperCase();
         //4.根据method发出请求
+        //(method === 'GET' || method === 'REQUEST') && !this._options.useCors
         if((method==='GET'||method ==='REQUEST')&&!this._options.useCors){
-            return AJAX.jsonp(url+'?'+serializeParams(_params),(resp)=>{
+            return Ajax.jsonp(url+'?'+serializeParams(_params),(resp)=>{
                 !!context?callback(resp):callback.call(context,resp);
             });
         }else{
-            return AJAX.post(url,params,(resp)=>{
+            return Ajax.get(url+'?'+serializeParams(_params),params,(resp)=>{
                 !!context?callback(resp):callback.call(context,resp);
             });
         }
