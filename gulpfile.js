@@ -17,7 +17,7 @@ gulp.task('minify', ['build'], () => {
 });
 
 gulp.task('watch', ['build'], () => {
-    gulp.watch(['./src/init.js', './gulpfile.js'], ['build']);
+    gulp.watch(['./src/**/*', './gulpfile.js'], ['build']);
 });
 
 gulp.task('test', ['build'], () => {
