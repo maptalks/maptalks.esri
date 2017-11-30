@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
     <html lang="en">
 
     <head>
@@ -8,7 +8,7 @@
         <title>Document</title>
         <!-- maptalks -->
         <link rel="stylesheet" href="./../node_modules/maptalks/dist/maptalks.css">
-        <script src="./../node_modules/maptalks/dist/maptalks.js"></script>
+        <script src="http://localhost:20000/maptalks.js"></script>
         <!-- maptalks.esri -->
         <script src="./../dist/maptalks.esri.js"></script>
     </head>
@@ -31,6 +31,7 @@
             });
             //esri imagelayer
             var imageLayer = new maptalks.esri.ImageMapLayer('imagemaplayer',{
+                renderer : 'canvas',
                 url:'https://landsat.arcgis.com/arcgis/rest/services/Landsat/PS/ImageServer'
             });
             //

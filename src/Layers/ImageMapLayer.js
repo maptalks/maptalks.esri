@@ -7,6 +7,7 @@ import ImageService from './../Services/ImageService';
 import merge from './../Utils/merge';
 
 const _options = {
+    renderer : maptalks.Browser.webgl ? 'gl' : 'canvas',
     updateInterval: 150,
     format: 'jpgpng',
     transparent: true,
@@ -22,19 +23,21 @@ export default class ImageMapLayer extends maptalks.Layer {
         this._url = options.url;
         this._service = new ImageService(this._url);
     }
-    /**
-     * 当layer加载到map后，调用onAdd方法
-     */
-    onAdd() {
-        //export image 用于render
-        let params = this._buildExportParams(),
-            that = this;
-        this._service.exportImage(params).then(function (resp) {
-            //获取结果图片地址
-            that._cacheData = JSON.parse(resp);
-        }, function (err) {
 
-        })
+    onLoad() {
+        if (this.cacheData) {
+            return true;
+        }
+        //export image 用于render
+        let params = this._buildExportParams();
+        this._service.exportImage(params).then(resp => {
+            //获取结果图片地址
+            this._cacheData = JSON.parse(resp);
+            this.load();
+        }, err => {
+
+        });
+        return false;
     }
 
     get cacheData() {
@@ -66,7 +69,7 @@ export default class ImageMapLayer extends maptalks.Layer {
 }
 
 
-ImageMapLayer.registerRenderer('canvas', class extends maptalks.renderer.CanvasRenderer {
+class ImageCanvasRenderer extends maptalks.renderer.CanvasRenderer {
 
 
     onAdd() {
@@ -76,24 +79,118 @@ ImageMapLayer.registerRenderer('canvas', class extends maptalks.renderer.CanvasR
     draw() {
         this.prepareCanvas();
         this._drawImage();
-        this.completeRender();
     }
 
     _drawImage() {
         let imgObj = this.layer.cacheData;
+        const nw = new maptalks.Coordinate(imgObj.extent.xmin, imgObj.extent.ymax)
         let that = this;
         if (!!imgObj) {
             let img = new Image();
+            img.onload = () => {
+                const pt = this.getMap()._prjToContainerPoint(nw);
+                this.context.drawImage(img, pt.x, pt.y);
+                this.completeRender();
+            };
             img.src = imgObj.href;
-            img.onload = function () {
-                let pt = that.layer.getMap()._prjToContainerPoint(new maptalks.Coordinate(imgObj.extent.xmin, imgObj.extent.ymax));
-                that.context.drawImage(img, pt.x, pt.y);
-            }
         }
     }
 
     drawOnInteracting() {
-        this.draw();
+        //this.draw()
+        //交互时的绘制，无需请求新的图片，直接绘制上一次获取到的map image
     }
 
+    hitDetect() {
+        return false;
+    }
+
+    //事件结束后的回调函数
+
+    onZoomEnd() {
+        super.onZoomEnd();
+    }
+
+    onMoveEnd() {
+        super.onMoveEnd();
+    }
+
+    onDragRotateEnd() {
+        super.onDragRotateEnd();
+    }
+
+};
+
+ImageMapLayer.registerRenderer('canvas', ImageCanvasRenderer);
+
+ImageMapLayer.registerRenderer('gl', class extends maptalks.renderer.ImageGLRenderable(ImageCanvasRenderer) {
+    draw() {
+        this.prepareCanvas();
+        this._drawImage();
+    }
+
+    _drawImage() {
+        const imgObj = this.layer.cacheData;
+        const map = this.getMap(),
+            glZoom = map.getGLZoom(),
+            glScale = map.getGLScale();
+        const that = this;
+        if (!!imgObj) {
+            const img = new Image();
+            img.onload = function () {
+                const nw = new maptalks.Coordinate(imgObj.extent.xmin,imgObj.extent.ymax);
+                let pt = that.layer.getMap()._prjToPoint(nw, glZoom);
+                const w = img.width * glScale,
+                    h = img.height * glScale;
+                that.drawGLImage(img, pt.x, pt.y, w, h, 1);
+                that.completeRender();
+            }
+            img.src = imgObj.href;
+        }
+    }
+
+    drawOnInteracting() {
+        //this.draw()
+        //交互时的绘制，无需请求新的图片，直接绘制上一次获取到的map image
+    }
+
+    onCanvasCreate() {
+        this.prepareGLCanvas();
+    }
+
+    resizeCanvas(canvasSize) {
+        if (!this.canvas) {
+            return;
+        }
+        super.resizeCanvas(canvasSize);
+        this.resizeGLCanvas();
+    }
+
+    clearCanvas() {
+        if (!this.canvas) {
+            return;
+        }
+        super.clearCanvas();
+        this.clearGLCanvas();
+    }
+
+    getCanvasImage() {
+        if (this.glCanvas && this.isCanvasUpdated()) {
+            const ctx = this.context;
+            if (Browser.retina) {
+                ctx.save();
+                ctx.scale(1 / 2, 1 / 2);
+            }
+            // draw gl canvas on layer canvas
+            ctx.drawImage(this.glCanvas, 0, 0);
+            if (Browser.retina) {
+                ctx.restore();
+            }
+        }
+        return super.getCanvasImage();
+    }
+
+    onRemove() {
+        this.removeGLCanvas();
+    }
 });
