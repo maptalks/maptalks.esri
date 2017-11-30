@@ -1122,8 +1122,8 @@ ImageMapLayer.registerRenderer('canvas', function (_maptalks$renderer$Ca) {
             var img = new Image();
             img.src = imgObj.href;
             img.onload = function () {
-                var pt = that.layer.getMap().prjToContainerPoint(new Coordinate(imgObj.extent.xmin, imgObj.extent.ymax));
-                that.context.drawImage(img, 0, 0);
+                var pt = that.layer.getMap()._prjToContainerPoint(new Coordinate(imgObj.extent.xmin, imgObj.extent.ymax));
+                that.context.drawImage(img, pt.x, pt.y);
             };
         }
     };

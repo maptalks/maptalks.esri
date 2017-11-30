@@ -86,8 +86,8 @@ ImageMapLayer.registerRenderer('canvas', class extends maptalks.renderer.CanvasR
             let img = new Image();
             img.src = imgObj.href;
             img.onload = function () {
-                let pt = that.layer.getMap().prjToContainerPoint(new maptalks.Coordinate(imgObj.extent.xmin,imgObj.extent.ymax));
-                that.context.drawImage(img, 0, 0);
+                let pt = that.layer.getMap()._prjToContainerPoint(new maptalks.Coordinate(imgObj.extent.xmin, imgObj.extent.ymax));
+                that.context.drawImage(img, pt.x, pt.y);
             }
         }
     }
