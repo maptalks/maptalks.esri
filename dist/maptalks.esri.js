@@ -630,7 +630,7 @@ var merge = function merge() {
   return (_babelHelpers = babelHelpers$1).extends.apply(_babelHelpers, [{}].concat(sources));
 };
 
-var serializeParams$1 = function serializeParams(params) {
+var serializeParams = function serializeParams(params) {
     var data = '';
     params.f = params.f || 'json';
 
@@ -661,51 +661,191 @@ var serializeParams$1 = function serializeParams(params) {
     return data;
 };
 
-var _options = {
+var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+
+
+
+
+function createCommonjsModule(fn, module) {
+	return module = { exports: {} }, fn(module, module.exports), module.exports;
+}
+
+var zousanMin = createCommonjsModule(function (module) {
+  !function (t) {
+    "use strict";
+    function e(t) {
+      if (t) {
+        var e = this;t(function (t) {
+          e.resolve(t);
+        }, function (t) {
+          e.reject(t);
+        });
+      }
+    }function n(t, e) {
+      if ("function" == typeof t.y) try {
+        var n = t.y.call(i, e);t.p.resolve(n);
+      } catch (o) {
+        t.p.reject(o);
+      } else t.p.resolve(e);
+    }function o(t, e) {
+      if ("function" == typeof t.n) try {
+        var n = t.n.call(i, e);t.p.resolve(n);
+      } catch (o) {
+        t.p.reject(o);
+      } else t.p.reject(e);
+    }var r,
+        i,
+        c = "fulfilled",
+        u = "rejected",
+        s = "undefined",
+        f = function () {
+      function e() {
+        for (; n.length - o;) {
+          try {
+            n[o]();
+          } catch (e) {
+            t.console && t.console.error(e);
+          }n[o++] = i, o == r && (n.splice(0, r), o = 0);
+        }
+      }var n = [],
+          o = 0,
+          r = 1024,
+          c = function () {
+        if ((typeof MutationObserver === "undefined" ? "undefined" : _typeof(MutationObserver)) !== s) {
+          var t = document.createElement("div"),
+              n = new MutationObserver(e);return n.observe(t, { attributes: !0 }), function () {
+            t.setAttribute("a", 0);
+          };
+        }return (typeof setImmediate === "undefined" ? "undefined" : _typeof(setImmediate)) !== s ? function () {
+          setImmediate(e);
+        } : function () {
+          setTimeout(e, 0);
+        };
+      }();return function (t) {
+        n.push(t), n.length - o == 1 && c();
+      };
+    }();e.prototype = { resolve: function resolve(t) {
+        if (this.state === r) {
+          if (t === this) return this.reject(new TypeError("Attempt to resolve promise with self"));var e = this;if (t && ("function" == typeof t || "object" == (typeof t === "undefined" ? "undefined" : _typeof(t)))) try {
+            var o = !0,
+                i = t.then;if ("function" == typeof i) return void i.call(t, function (t) {
+              o && (o = !1, e.resolve(t));
+            }, function (t) {
+              o && (o = !1, e.reject(t));
+            });
+          } catch (u) {
+            return void (o && this.reject(u));
+          }this.state = c, this.v = t, e.c && f(function () {
+            for (var o = 0, r = e.c.length; r > o; o++) {
+              n(e.c[o], t);
+            }
+          });
+        }
+      }, reject: function reject(n) {
+        if (this.state === r) {
+          this.state = u, this.v = n;var i = this.c;i ? f(function () {
+            for (var t = 0, e = i.length; e > t; t++) {
+              o(i[t], n);
+            }
+          }) : !e.suppressUncaughtRejectionError && t.console && t.console.log("You upset Zousan. Please catch rejections: ", n, n ? n.stack : null);
+        }
+      }, then: function then(t, i) {
+        var u = new e(),
+            s = { y: t, n: i, p: u };if (this.state === r) this.c ? this.c.push(s) : this.c = [s];else {
+          var l = this.state,
+              a = this.v;f(function () {
+            l === c ? n(s, a) : o(s, a);
+          });
+        }return u;
+      }, "catch": function _catch(t) {
+        return this.then(null, t);
+      }, "finally": function _finally(t) {
+        return this.then(t, t);
+      }, timeout: function timeout(t, n) {
+        n = n || "Timeout";var o = this;return new e(function (e, r) {
+          setTimeout(function () {
+            r(Error(n));
+          }, t), o.then(function (t) {
+            e(t);
+          }, function (t) {
+            r(t);
+          });
+        });
+      } }, e.resolve = function (t) {
+      var n = new e();return n.resolve(t), n;
+    }, e.reject = function (t) {
+      var n = new e();return n.reject(t), n;
+    }, e.all = function (t) {
+      function n(n, c) {
+        n && "function" == typeof n.then || (n = e.resolve(n)), n.then(function (e) {
+          o[c] = e, r++, r == t.length && i.resolve(o);
+        }, function (t) {
+          i.reject(t);
+        });
+      }for (var o = [], r = 0, i = new e(), c = 0; c < t.length; c++) {
+        n(t[c], c);
+      }return t.length || i.resolve(o), i;
+    }, 'object' != s && module.exports && (module.exports = e), t.define && t.define.amd && t.define([], function () {
+      return e;
+    }), t.Zousan = e, e.soon = f;
+  }("undefined" != typeof commonjsGlobal ? commonjsGlobal : commonjsGlobal);
+});
+
+var promise = void 0;
+
+if (typeof Promise !== 'undefined') {
+    promise = Promise;
+} else {
+    promise = zousanMin;
+}
+
+var Promise$1 = promise;
+
+var _options$1 = {
     proxy: false,
     useCors: cors,
     timeout: 0
 };
 
 var Service = function () {
-    function Service(url, options) {
+    function Service(url) {
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
         classCallCheck(this, Service);
 
-        this._options = merge({}, _options, options);
+        this._options = merge({}, _options$1, options);
         this._url = cleanUrl(url);
-        this._token = null;
+        this._token = this._options.token || null;
     }
 
     Service.prototype.authenticate = function authenticate(token) {
         this._token = token;
     };
 
-    Service.prototype.metadata = function metadata(callback, context) {
-        return this._request('GET', '', {}, callback, context);
-    };
-
-    Service.prototype.get = function get$$1(path, params, callback, context) {
-        return this._request('GET', path, params, callback, context);
-    };
-
-    Service.prototype.request = function request(path, params, callback, context) {
-        return this._request('REQUEST', path, params, callback, context);
-    };
-
-    Service.prototype._request = function _request(method, path, params, callback, context) {
+    Service.prototype.request = function request(method, path, params) {
         var url = this._options.proxy ? this._options.proxy + '?' + this._url + path : this._url + path;
 
         params = !!this._token ? merge({}, params, { token: this._token }) : merge({}, params);
 
-        method = method.toUpperCase();
+        method = method.toLowerCase();
 
-        if ((method === 'GET' || method === 'REQUEST') && !this._options.useCors) {
-            return maptalks.Ajax.jsonp(url + '?' + serializeParams$1(_params), function (resp) {
-                !!context ? callback(resp) : callback.call(context, resp);
+        if (method === 'get' && !this._options.useCors) {
+            return new Promise$1(function (resolve, reject) {
+                maptalks.Ajax.jsonp(url + '?' + serializeParams(params), function (err, resp) {
+                    err === null ? resolve(resp) : reject(err);
+                });
             });
-        } else {
-            return maptalks.Ajax.get(url,function (resp) {
-                !!context ? callback(resp) : callback.call(context, resp);
+        } else if (method === 'get') {
+            return new Promise$1(function (resolve, reject) {
+                maptalks.Ajax.get(url + '?' + serializeParams(params), function (err, resp) {
+                    err === null ? resolve(resp) : reject(err);
+                });
+            });
+        } else if (method === 'post') {
+            return new Promise$1(function (resolve, reject) {
+                maptalks.Ajax.get(url, params, function (err, resp) {
+                    err === null ? resolve(resp) : reject(err);
+                });
             });
         }
     };
@@ -714,50 +854,38 @@ var Service = function () {
 }();
 
 var Task = function () {
-    function Task(endpoint) {
-        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-        classCallCheck(this, Task);
+  function Task(service) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    classCallCheck(this, Task);
 
-        this._service = endpoint;
-        this._formatted = false;
-        this._params = {};
+    this._service = service;
+
+    this._formatted = false;
+
+    this._params = {};
+  }
+
+  Task.prototype.request = function request(method, params) {
+    var _params = merge({}, this._params, params);
+    return this._service.request(method, this._path, _params);
+  };
+
+  Task.prototype.run = function run() {
+    throw Error(this.constructorName + 'is no implemention run function');
+  };
+
+  createClass(Task, [{
+    key: 'token',
+    set: function set$$1(value) {
+      this._service.authenticate(value);
     }
-
-    Task.prototype.request = function request(callback, context) {
-        var params = merge({}, this._params);
-        if (this._service) return this._service.request(this._path, params, callback, context);else return this._locRequest();
-    };
-
-    Task.prototype._locRequest = function _locRequest(method, path, params, callback, context) {
-        var url = this._url;
-
-        if ((method === 'GET' || method === 'REQUEST') && !this._options.useCors) {
-            return maptalks.Ajax.jsonp(url + '?' + serializeParams(_params), function (resp) {
-                !!context ? callback(resp) : callback.call(context, resp);
-            });
-        } else {
-            return maptalks.Ajax.post(url, params, function (resp) {
-                !!context ? callback(resp) : callback.call(context, resp);
-            });
-        }
-    };
-
-    Task.prototype.run = function run() {
-        throw Error(this.constructorName + 'is no implemention run function');
-    };
-
-    createClass(Task, [{
-        key: "token",
-        set: function set$$1(value) {
-            this._service.authenticate(value);
-        }
-    }, {
-        key: "formatted",
-        set: function set$$1(boolean) {
-            this._formatted = boolean;
-        }
-    }]);
-    return Task;
+  }, {
+    key: 'formatted',
+    set: function set$$1(boolean) {
+      this._formatted = boolean;
+    }
+  }]);
+  return Task;
 }();
 
 var IdentifyTask = function (_Task) {
@@ -840,6 +968,53 @@ var IdentifyImageTask = function (_IdentifyTask) {
     return IdentifyImageTask;
 }(IdentifyTask);
 
+var MetadataTask = function (_Task) {
+    inherits(MetadataTask, _Task);
+
+    function MetadataTask(service) {
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+        classCallCheck(this, MetadataTask);
+
+        var _this = possibleConstructorReturn(this, _Task.call(this, service, options));
+
+        _this._path = "";
+        return _this;
+    }
+
+    MetadataTask.prototype.run = function run() {
+        return this.request('get', {});
+    };
+
+    return MetadataTask;
+}(Task);
+
+var ExportImageTask = function (_Task) {
+    inherits(ExportImageTask, _Task);
+
+    function ExportImageTask(endpoint, params) {
+        classCallCheck(this, ExportImageTask);
+
+        var _this = possibleConstructorReturn(this, _Task.call(this, endpoint, params));
+
+        _this._path = 'exportImage';
+        return _this;
+    }
+
+    ExportImageTask.prototype.run = function run() {
+        return this.request('get', this._params);
+    };
+
+    createClass(ExportImageTask, [{
+        key: 'params',
+        set: function set$$1() {
+            var value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+            this._params = merge({}, this._params, value);
+        }
+    }]);
+    return ExportImageTask;
+}(Task);
+
 var ImageService = function (_Service) {
     inherits(ImageService, _Service);
 
@@ -847,6 +1022,23 @@ var ImageService = function (_Service) {
         classCallCheck(this, ImageService);
         return possibleConstructorReturn(this, _Service.apply(this, arguments));
     }
+
+    ImageService.prototype.metadata = function metadata() {
+        this._metadataTask = this._metadataTask || new MetadataTask(this);
+        return this._metadataTask.run();
+    };
+
+    ImageService.prototype.GetSamples = function GetSamples() {};
+
+    ImageService.prototype.CouputeClassStatistics = function CouputeClassStatistics() {};
+
+    ImageService.prototype.ComputeHistograms = function ComputeHistograms() {};
+
+    ImageService.prototype.exportImage = function exportImage(params) {
+        this._exportImageTask = this._exportImageTask || new ExportImageTask(this);
+        this._exportImageTask.params = params;
+        return this._exportImageTask.run();
+    };
 
     ImageService.prototype.query = function query() {};
 
@@ -857,26 +1049,57 @@ var ImageService = function (_Service) {
     return ImageService;
 }(Service);
 
+var _options = {
+    updateInterval: 150,
+    format: 'jpgpng',
+    transparent: true,
+    f: 'image'
+};
+
 var ImageMapLayer = function (_maptalks$Layer) {
     inherits(ImageMapLayer, _maptalks$Layer);
 
-    function ImageMapLayer(id, options) {
+    function ImageMapLayer(id) {
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
         classCallCheck(this, ImageMapLayer);
 
         var _this = possibleConstructorReturn(this, _maptalks$Layer.call(this, id, options));
 
+        _this._options = merge({}, _options, options);
         _this._url = options.url;
         _this._service = new ImageService(_this._url);
-        _this._identify();
         return _this;
     }
 
-    ImageMapLayer.prototype._identify = function _identify() {
-        this._service.identify().run(function (resp) {
-            var s = "";
-        }, this);
+    ImageMapLayer.prototype.onAdd = function onAdd() {
+        var params = this._buildExportParams(),
+            that = this;
+        this._service.exportImage(params).then(function (resp) {
+            that._cacheData = JSON.parse(resp);
+        }, function (err) {});
     };
 
+    ImageMapLayer.prototype._buildExportParams = function _buildExportParams() {
+        var map = this.getMap(),
+            params = {},
+            prj_extent = map.getProjExtent(),
+            map_size = map.getSize();
+        params.bbox = [prj_extent.xmin, prj_extent.ymin, prj_extent.xmax, prj_extent.ymax];
+        params.size = map_size.width + ',' + map_size.height;
+        params.format = this._options.format;
+        params.transparent = this._options.transparent;
+
+        params.bboxSR = "";
+        params.imageSR = "";
+        return params;
+    };
+
+    createClass(ImageMapLayer, [{
+        key: 'cacheData',
+        get: function get$$1() {
+            return this._cacheData;
+        }
+    }]);
     return ImageMapLayer;
 }(maptalks.Layer);
 
@@ -888,7 +1111,30 @@ ImageMapLayer.registerRenderer('canvas', function (_maptalks$renderer$Ca) {
         return possibleConstructorReturn(this, _maptalks$renderer$Ca.apply(this, arguments));
     }
 
-    _class.prototype.draw = function draw() {};
+    _class.prototype.onAdd = function onAdd() {};
+
+    _class.prototype.draw = function draw() {
+        this.prepareCanvas();
+        this._drawImage();
+        this.completeRender();
+    };
+
+    _class.prototype._drawImage = function _drawImage() {
+        var imgObj = this.layer.cacheData;
+        var that = this;
+        if (!!imgObj) {
+            var img = new Image();
+            img.src = imgObj.href;
+            img.onload = function () {
+                var pt = that.layer.getMap()._prjToContainerPoint(new maptalks.Coordinate(imgObj.extent.xmin, imgObj.extent.ymax));
+                that.context.drawImage(img, pt.x, pt.y);
+            };
+        }
+    };
+
+    _class.prototype.drawOnInteracting = function drawOnInteracting() {
+        this.draw();
+    };
 
     return _class;
 }(maptalks.renderer.CanvasRenderer));
