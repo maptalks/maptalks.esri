@@ -7,13 +7,12 @@ import ImageService from './../Services/ImageService';
 import merge from './../Utils/merge';
 
 const _options = {
-    renderer : maptalks.Browser.webgl ? 'gl' : 'canvas',
+    renderer: maptalks.Browser.webgl ? 'gl' : 'canvas',
     updateInterval: 150,
     format: 'jpgpng',
     transparent: true,
     f: 'image',
 }
-
 
 export default class ImageMapLayer extends maptalks.Layer {
 
@@ -124,6 +123,7 @@ class ImageCanvasRenderer extends maptalks.renderer.CanvasRenderer {
 ImageMapLayer.registerRenderer('canvas', ImageCanvasRenderer);
 
 ImageMapLayer.registerRenderer('gl', class extends maptalks.renderer.ImageGLRenderable(ImageCanvasRenderer) {
+
     draw() {
         this.prepareCanvas();
         this._drawImage();
@@ -137,8 +137,9 @@ ImageMapLayer.registerRenderer('gl', class extends maptalks.renderer.ImageGLRend
         const that = this;
         if (!!imgObj) {
             const img = new Image();
+            img.crossOrigin = "anonymous";
             img.onload = function () {
-                const nw = new maptalks.Coordinate(imgObj.extent.xmin,imgObj.extent.ymax);
+                const nw = new maptalks.Coordinate(imgObj.extent.xmin, imgObj.extent.ymax);
                 let pt = that.layer.getMap()._prjToPoint(nw, glZoom);
                 const w = img.width * glScale,
                     h = img.height * glScale;
@@ -177,13 +178,13 @@ ImageMapLayer.registerRenderer('gl', class extends maptalks.renderer.ImageGLRend
     getCanvasImage() {
         if (this.glCanvas && this.isCanvasUpdated()) {
             const ctx = this.context;
-            if (Browser.retina) {
+            if (maptalks.Browser.retina) {
                 ctx.save();
                 ctx.scale(1 / 2, 1 / 2);
             }
             // draw gl canvas on layer canvas
             ctx.drawImage(this.glCanvas, 0, 0);
-            if (Browser.retina) {
+            if (maptalks.Browser.retina) {
                 ctx.restore();
             }
         }

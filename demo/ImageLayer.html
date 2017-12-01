@@ -8,7 +8,8 @@
         <title>Document</title>
         <!-- maptalks -->
         <link rel="stylesheet" href="./../node_modules/maptalks/dist/maptalks.css">
-        <script src="http://localhost:20000/maptalks.js"></script>
+        <script src="./../node_modules/maptalks/dist/maptalks.js"></script>
+        <!-- <script src="http://localhost:20000/maptalks.js"></script> -->
         <!-- maptalks.esri -->
         <script src="./../dist/maptalks.esri.js"></script>
     </head>
@@ -31,7 +32,8 @@
             });
             //esri imagelayer
             var imageLayer = new maptalks.esri.ImageMapLayer('imagemaplayer',{
-                renderer : 'canvas',
+                // renderer : 'canvas',
+                renderer : 'gl',
                 url:'https://landsat.arcgis.com/arcgis/rest/services/Landsat/PS/ImageServer'
             });
             //
