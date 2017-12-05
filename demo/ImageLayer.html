@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
     <html lang="en">
 
     <head>
@@ -9,19 +9,18 @@
         <!-- maptalks -->
         <link rel="stylesheet" href="./../node_modules/maptalks/dist/maptalks.css">
         <script src="./../node_modules/maptalks/dist/maptalks.js"></script>
-        <!-- <script src="http://localhost:20000/maptalks.js"></script> -->
         <!-- maptalks.esri -->
         <script src="./../dist/maptalks.esri.js"></script>
     </head>
 
     <body>
         <!--map document div-->
-        <div id='mapDiv' style="width:1200px;height:800px;" class="container"> </div>
-        <script>
+        <div id='mapDiv' style="width:800px;height:600px;" class="container"> </div>
+        <script type="text/javascript">
             // default map object
             var map = new maptalks.Map('mapDiv', {
                 center: [-122.23,37.75],
-                zoom: 10,
+                zoom: 12,
                 attribution: {
                     content: '&copy; <a href="http://osm.org">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/">CARTO</a>'
                 },

@@ -5,6 +5,7 @@
 import * as maptalks from 'maptalks';
 import ImageService from './../Services/ImageService';
 import merge from './../Utils/merge';
+import Delaunay from './../Utils/delaunay';
 
 const _options = {
     renderer: maptalks.Browser.webgl ? 'gl' : 'canvas',
@@ -32,6 +33,8 @@ export default class ImageMapLayer extends maptalks.Layer {
         this._service.exportImage(params).then(resp => {
             //获取结果图片地址
             this._cacheData = JSON.parse(resp);
+            this._buildDelaunay();
+            //
             this.load();
         }, err => {
 
@@ -41,11 +44,13 @@ export default class ImageMapLayer extends maptalks.Layer {
 
     get cacheData() {
         return this._cacheData;
-        // if (this._cacheData === null)
-        //     return null;
-        // let [...cacheData] = [this._cacheData];
-        // this._cacheData = null;
-        // return cacheData[0];
+    }
+
+    get tin(){
+        return {
+            vertices:this._vertices,
+            triangles:this._triangles
+        };
     }
 
     _buildExportParams() {
@@ -64,6 +69,23 @@ export default class ImageMapLayer extends maptalks.Layer {
         return params;
     }
 
+    _buildDelaunay() {
+        const width = 800,
+            height=600;
+        let vertices = new Array(256), i, x, y;
+        for (i = vertices.length; i--;) {
+            do {
+                x = Math.random() - 0.5;
+                y = Math.random() - 0.5;
+            } while (x * x + y * y > 0.25);
+            x = (x * 0.96875 + 0.5) * width;
+            y = (y * 0.96875 + 0.5) * height;
+            vertices[i] = [x, y];
+        }
+        let triangles = Delaunay.triangulate(vertices);
+        this._vertices = vertices;
+        this._triangles = triangles;
+    }
 
 }
 
@@ -143,7 +165,7 @@ ImageMapLayer.registerRenderer('gl', class extends maptalks.renderer.ImageGLRend
                 let pt = that.layer.getMap()._prjToPoint(nw, glZoom);
                 const w = img.width * glScale,
                     h = img.height * glScale;
-                that.drawGLImage(img, pt.x, pt.y, w, h, 1);
+                that.drawGLtin(img,that.layer.tin, pt.x, pt.y, w, h, 1);
                 that.completeRender();
             }
             img.src = imgObj.href;
