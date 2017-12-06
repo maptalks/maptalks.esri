@@ -13,7 +13,7 @@ const _options = {
     format: 'jpgpng',
     transparent: true,
     f: 'image',
-}
+};
 
 export default class ImageMapLayer extends maptalks.Layer {
 
@@ -29,15 +29,16 @@ export default class ImageMapLayer extends maptalks.Layer {
             return true;
         }
         //export image 用于render
-        let params = this._buildExportParams();
+        const params = this._buildExportParams();
         this._service.exportImage(params).then(resp => {
             //获取结果图片地址
             this._cacheData = JSON.parse(resp);
+            this._width = this._cacheData.width;
+            this._height = this._cacheData.height;
             this._buildDelaunay();
-            //
             this.load();
         }, err => {
-
+            console.log(err);
         });
         return false;
     }
@@ -46,46 +47,49 @@ export default class ImageMapLayer extends maptalks.Layer {
         return this._cacheData;
     }
 
-    get tin(){
+    get tin() {
         return {
-            vertices:this._vertices,
-            triangles:this._triangles
+            w:this._width,
+            h:this._height,
+            vertices: this._vertices,
+            triangles: this._triangles
         };
     }
 
     _buildExportParams() {
         //空的params
-        let map = this.getMap(),
+        const map = this.getMap(),
             params = {},
-            prj_extent = map.getProjExtent(),
-            map_size = map.getSize();
-        params.bbox = [prj_extent.xmin, prj_extent.ymin, prj_extent.xmax, prj_extent.ymax];
-        params.size = map_size.width + ',' + map_size.height;
+            prjExtent = map.getProjExtent(),
+            mapSize = map.getSize();
+        params.bbox = [prjExtent.xmin, prjExtent.ymin, prjExtent.xmax, prjExtent.ymax];
+        params.size = mapSize.width + ',' + mapSize.height;
         params.format = this._options.format;
         params.transparent = this._options.transparent;
         //}{axmand debug
-        params.bboxSR = "";
-        params.imageSR = "";
+        params.bboxSR = '';
+        params.imageSR = '';
         return params;
     }
 
     _buildDelaunay() {
-        const width = 800,
-            height=600;
-        let vertices = new Array(48), i, x, y;
+        const vertices = new Array(48),
+            w = this._width,
+            h = this._height;
+        let i, x, y;
         for (i = vertices.length; i--;) {
             do {
                 x = Math.random() - 0.5;
                 y = Math.random() - 0.5;
             } while (x * x + y * y > 0.25);
-            x = (x * 0.96875 + 0.5) * width/3;
-            y = (y * 0.96875 + 0.5) * height/3;
+            x = (x * 0.96875 + 0.5) * w;
+            y = (y * 0.96875 + 0.5) * h;
             vertices[i] = [x, y];
         }
-        let triangles = Delaunay.triangulate(vertices);
+        const triangles = Delaunay.triangulate(vertices);
         //更新vertices
         for (i = vertices.length; i--;) {
-            vertices[i] = vertices[i].concat(Math.random()*30);
+            vertices[i] = vertices[i].concat(Math.random() * 30);
         }
         this._vertices = vertices;
         this._triangles = triangles;
@@ -107,11 +111,10 @@ class ImageCanvasRenderer extends maptalks.renderer.CanvasRenderer {
     }
 
     _drawImage() {
-        let imgObj = this.layer.cacheData;
-        const nw = new maptalks.Coordinate(imgObj.extent.xmin, imgObj.extent.ymax)
-        let that = this;
-        if (!!imgObj) {
-            let img = new Image();
+        const imgObj = this.layer.cacheData,
+            nw = new maptalks.Coordinate(imgObj.extent.xmin, imgObj.extent.ymax);
+        if (imgObj) {
+            const img = new Image();
             img.onload = () => {
                 const pt = this.getMap()._prjToContainerPoint(nw);
                 this.context.drawImage(img, pt.x, pt.y);
@@ -144,7 +147,7 @@ class ImageCanvasRenderer extends maptalks.renderer.CanvasRenderer {
         super.onDragRotateEnd();
     }
 
-};
+}
 
 ImageMapLayer.registerRenderer('canvas', ImageCanvasRenderer);
 
@@ -162,19 +165,31 @@ ImageMapLayer.registerRenderer('gl', class extends maptalks.renderer.ImageGLRend
             glZoom = map.getGLZoom(),
             glScale = map.getGLScale(),
             vertices = this.layer.tin.vertices,
-            triangles = this.layer.tin.triangles;
+            triangles = this.layer.tin.triangles,
+            w = this.layer.tin.w,
+            h = this.layer.tin.h,
+            len = vertices.length;
 
-        if (!!imgObj) {
+        if (imgObj) {
             const img = new Image();
-            img.crossOrigin = "anonymous";
+            img.crossOrigin = 'anonymous';
             img.onload = function () {
                 const nw = new maptalks.Coordinate(imgObj.extent.xmin, imgObj.extent.ymax);
-                let pt = that.layer.getMap()._prjToPoint(nw, glZoom);
-                const w = img.width * glScale,
-                    h = img.height * glScale;
-                that.drawGLTin(img,vertices,triangles, pt.x, pt.y, 1);
+                const pt = that.layer.getMap()._prjToPoint(nw, glZoom);
+                const vtcs = [],
+                    txcoord = [];
+                for (let i = 0; i < len; i++) {
+                    //1.build vertices
+                    vtcs.push(pt.x + vertices[i][0] * glScale);
+                    vtcs.push(pt.y + vertices[i][1] * glScale);
+                    vtcs.push(vertices[i][2]);
+                    //2.build txcoord
+                    txcoord.push(vertices[i][0] / w);
+                    txcoord.push(vertices[i][1] / h);
+                }
+                that.drawGLTin(img, vtcs, txcoord, triangles, 1);
                 that.completeRender();
-            }
+            };
             img.src = imgObj.href;
         }
     }
