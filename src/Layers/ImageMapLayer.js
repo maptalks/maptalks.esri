@@ -72,17 +72,21 @@ export default class ImageMapLayer extends maptalks.Layer {
     _buildDelaunay() {
         const width = 800,
             height=600;
-        let vertices = new Array(256), i, x, y;
+        let vertices = new Array(48), i, x, y;
         for (i = vertices.length; i--;) {
             do {
                 x = Math.random() - 0.5;
                 y = Math.random() - 0.5;
             } while (x * x + y * y > 0.25);
-            x = (x * 0.96875 + 0.5) * width;
-            y = (y * 0.96875 + 0.5) * height;
+            x = (x * 0.96875 + 0.5) * width/3;
+            y = (y * 0.96875 + 0.5) * height/3;
             vertices[i] = [x, y];
         }
         let triangles = Delaunay.triangulate(vertices);
+        //更新vertices
+        for (i = vertices.length; i--;) {
+            vertices[i] = vertices[i].concat(Math.random()*30);
+        }
         this._vertices = vertices;
         this._triangles = triangles;
     }
@@ -152,11 +156,14 @@ ImageMapLayer.registerRenderer('gl', class extends maptalks.renderer.ImageGLRend
     }
 
     _drawImage() {
-        const imgObj = this.layer.cacheData;
+        const imgObj = this.layer.cacheData,
+            that = this;
         const map = this.getMap(),
             glZoom = map.getGLZoom(),
-            glScale = map.getGLScale();
-        const that = this;
+            glScale = map.getGLScale(),
+            vertices = this.layer.tin.vertices,
+            triangles = this.layer.tin.triangles;
+
         if (!!imgObj) {
             const img = new Image();
             img.crossOrigin = "anonymous";
@@ -165,7 +172,7 @@ ImageMapLayer.registerRenderer('gl', class extends maptalks.renderer.ImageGLRend
                 let pt = that.layer.getMap()._prjToPoint(nw, glZoom);
                 const w = img.width * glScale,
                     h = img.height * glScale;
-                that.drawGLtin(img,that.layer.tin, pt.x, pt.y, w, h, 1);
+                that.drawGLTin(img,vertices,triangles, pt.x, pt.y, 1);
                 that.completeRender();
             }
             img.src = imgObj.href;
