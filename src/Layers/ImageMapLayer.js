@@ -187,7 +187,7 @@ ImageMapLayer.registerRenderer('gl', class extends maptalks.renderer.ImageGLRend
                     txcoord.push(vertices[i][0] / w);
                     txcoord.push(vertices[i][1] / h);
                 }
-                that.drawGLTin(img, vtcs, txcoord, triangles, 1);
+                that.drawTinImage(img, vtcs, txcoord, triangles, 1);
                 that.completeRender();
             };
             img.src = imgObj.href;

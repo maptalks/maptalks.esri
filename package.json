@@ -5,7 +5,7 @@
   "main": "/src/init.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev" : "gulp watch"
+    "dev": "gulp watch"
   },
   "repository": {
     "type": "git",
@@ -22,7 +22,7 @@
     "babel-plugin-transform-object-assign": "^6.22.0",
     "babel-preset-es2015": "^6.24.1",
     "gulp": "^3.9.1",
-    "maptalks": "^0.35.1",
+    "maptalks": "^0.36.0",
     "maptalks-build-helpers": "^0.4.2",
     "zousan": "^2.3.3"
   }
