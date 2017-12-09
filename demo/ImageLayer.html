@@ -7,10 +7,13 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>Document</title>
         <!-- maptalks -->
-        <link rel="stylesheet" href="./../node_modules/maptalks/dist/maptalks.css">
-        <script src="./../node_modules/maptalks/dist/maptalks.js"></script>
+        <!--<link rel="stylesheet" href="./../node_modules/maptalks/dist/maptalks.css">
+        <script src="./../node_modules/maptalks/dist/maptalks.js"></script>-->
+        <link href="../maptalks/maptalks.css" rel="stylesheet" />
+        <script src="../maptalks/maptalks.js"></script>
         <!-- maptalks.esri -->
-        <script src="./../dist/maptalks.esri.js"></script>
+        <!--<script src="./../dist/maptalks.esri.js"></script>-->
+        <script src="../dist/maptalks.esri.js"></script>
     </head>
 
     <body>
@@ -19,7 +22,8 @@
         <script type="text/javascript">
             // default map object
             var map = new maptalks.Map('mapDiv', {
-                center: [-122.23,37.75],
+                //center: [-122.23,37.75],
+                center:[ 109.22450763502036,34.367512417065313],
                 zoom: 12,
                 attribution: {
                     content: '&copy; <a href="http://osm.org">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/">CARTO</a>'
@@ -30,13 +34,33 @@
                 })
             });
             //esri imagelayer
-            var imageLayer = new maptalks.esri.ImageMapLayer('imagemaplayer',{
+            /*var imageLayer = new maptalks.esri.ImageMapLayer('imagemaplayer',{
                 // renderer : 'canvas',
                 renderer : 'gl',
                 url:'https://landsat.arcgis.com/arcgis/rest/services/Landsat/PS/ImageServer'
             });
             //
-            map.addLayer(imageLayer);
+            map.addLayer(imageLayer);*/
+            var flayer = new maptalks.esri.FeatureLayer('flayer','http://117.36.75.134:6080/arcgis/rest/services/LT/WBJ/FeatureServer/1');
+            flayer.addTo(map);
+            var features =[{
+                "geometry" : {"x" : 114.25, "y" : 33.80},      
+                "attributes" : {
+                   "id" : "1",
+                   "name" : "Joe Smith"
+                }
+              },
+              {
+                "geometry" : { "x" : 114.27, "y" : 34.086 },      
+                "attributes" : {
+                  "id" : "2",
+                  "name" : "John Doe"
+                 }
+              }
+            ];
+            /*flayer.addFeatures(features,function(res){
+                console.log(res);
+            });*/
         </script>
     </body>
 
