@@ -23,8 +23,7 @@ export default class FeatureLayer extends maptalks.VectorLayer {
         if (this._cacheData) {
             return true;
         }
-        const params = this._buildParams();
-        this._service.query(params).then(resp => {
+        this._service.query(this._options).then(resp => {
             const data = JSON.parse(resp);
             this._cacheData = data;
             const geos = this._createGeometries(data.features, data.geometryType);
@@ -36,6 +35,16 @@ export default class FeatureLayer extends maptalks.VectorLayer {
         });
         return false;
     }
+
+    query() {
+        this._service.query(option).then(resp => {
+            const result = JSON.parse(resp);
+            callback(result);
+        }, err => {
+            console.log(err);
+            callback(err);
+        });
+    }
     
     addFeatures(features, callback){
         this._service.addFeatures(features).then(resp => {
@@ -44,14 +53,29 @@ export default class FeatureLayer extends maptalks.VectorLayer {
         }, err => {
             console.log(err);
             callback(err);
-        })
+        });
     }
     
-    _buildParams() {
-        const params = {
-        }; 
-        return params;
+    updateFeatures(features, callback){
+        this._service.updateFeatures(features).then(resp => {
+            const result = JSON.parse(resp);
+            callback(result);
+        }, err => {
+            console.log(err);
+            callback(err);
+        });
     }
+
+    deleteFeatures(option, callback){
+        this._service.deleteFeatures(option).then(resp => {
+            const result = JSON.parse(resp);
+            callback(result);
+        }, err => {
+            console.log(err);
+            callback(err);
+        });
+    }
+
 
     _createGeometries(features, type) {
         let geometries = null;

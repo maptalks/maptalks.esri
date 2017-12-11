@@ -68,7 +68,7 @@ class Service {
             });
         } else if (method === 'post') {
             return new Promise(function (resolve, reject) {
-                Ajax.post({url:url}, params, (err,resp) => {
+                Ajax.post({url:url}, serializeParams(params), (err,resp) => {
                     err===null?resolve(resp):reject(err);
                 });
             });

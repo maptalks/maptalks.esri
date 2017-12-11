@@ -5,7 +5,7 @@ import {Ajax} from 'maptalks';
 import Service from './Service';
 import MetadataTask from './../Support/MetadataTask';
 import QueryTask from './../Support/QueryTask';
-import AddFeaturesTask from './../Support/AddFeaturesTask';
+import FeaturesTask from './../Support/FeaturesTask';
 
 
 /**
@@ -38,7 +38,7 @@ export default class FeatureService extends Service{
         return this._metadataTask.run();
     }
     
-    _parserQueryParams(option) {
+    _QueryParams(option) {
         const geometry = option.geometry || '';
         const condition = {
             where: option.where || '1=1',
@@ -59,17 +59,44 @@ export default class FeatureService extends Service{
         return condition;
     }
 
-    _parserAddFeaturesParams(features) {
+    _AddParams(features) {
         return {
             features: features,
             gdbVersion:'',
             rollbackOnFailure: true,
-            f:'json'
+            f:'pjson'
         }
     }
 
+    _UpdateParams(features) {
+       return {
+            features: features,
+            gdbVersion:'',
+            rollbackOnFailure: true,
+            f:'pjson'
+        } 
+    }
+
+   _deleteParams(option) {
+        if(option.objectIds) {
+            return {
+                objectIds:option.objectIds,
+                f:'pjson'
+            }
+        } else {
+            return {
+                where: option.where || '1=1',
+                geometry: (geometry instanceof Object) ? JSON.stringify(geometry) : geometry,
+                geometryType: option.geometryType || 'esriGeometryPoint',
+                inSR: option.inSR || '',
+                spatialRel: option.esriSpatialRelIntersects || 'esriSpatialRelIntersects',
+                f:'pjson'
+            };
+        }
+   }
+
     query(option={}){
-        const params = this._parserQueryParams(option);
+        const params = this._QueryParams(option);
         this._queryTask=this._queryTask||new QueryTask(this);
         this._queryTask.params = params;
         return this._queryTask.run();
@@ -95,16 +122,26 @@ export default class FeatureService extends Service{
     参考http://resources.arcgis.com/en/help/arcgis-rest-api/#/Add_Features/02r30000010m000000/
      */
     addFeatures(features) {
-       const params = this._parserAddFeaturesParams(features);
-       this._addFeaturesTask=this._addFeaturesTask||new AddFeaturesTask(this);
-       this._addFeaturesTask.params = params;
-       return this._addFeaturesTask.run();
-    }
-    /**
-     * 获取配置信息，用于设置加载位置等
-     */
-    identify(){
-        //return new IdentifyImageTask(this);   
+       const params = this._AddParams(features);
+       this._FeaturesTask=this._FeaturesTask||new FeaturesTask(this);
+       this._FeaturesTask.params = params;
+       this._FeaturesTask._path = 'addFeatures';
+       return this._FeaturesTask.run();
     }
 
+    updateFeatures(features) {
+       const params = this._UpdateParams(features);
+       this._FeaturesTask=this._FeaturesTask||new FeaturesTask(this);
+       this._FeaturesTask.params = params;
+       this._FeaturesTask._path = 'updateFeatures';
+       return this._FeaturesTask.run();
+    }
+
+    deleteFeatures(option={}) {
+       const params = this._deleteParams(option);
+       this._FeaturesTask=this._FeaturesTask||new FeaturesTask(this);
+       this._FeaturesTask.params = params;
+       this._FeaturesTask._path = 'deleteFeatures';
+       return this._FeaturesTask.run();
+    }
 }

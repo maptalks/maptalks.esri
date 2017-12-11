@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Document</title>
+        <!-- maptalks -->
+        <!--<link rel="stylesheet" href="./../node_modules/maptalks/dist/maptalks.css">
+        <script src="./../node_modules/maptalks/dist/maptalks.js"></script>-->
+        <link href="../maptalks/maptalks.css" rel="stylesheet" />
+        <script src="../maptalks/maptalks.js"></script>
+        <!-- maptalks.esri -->
+        <!--<script src="./../dist/maptalks.esri.js"></script>-->
+        <script src="../dist/maptalks.esri.js"></script>
+    </head>
+
+    <body>
+        <!--map document div-->
+        <div id='mapDiv' style="width:800px;height:600px;" class="container"> </div>
+        <script type="text/javascript">
+            // default map object
+            var map = new maptalks.Map('mapDiv', {
+                //center: [-122.23,37.75],
+                center:[ 109.22450763502036,34.367512417065313],
+                zoom: 12,
+                attribution: {
+                    content: '&copy; <a href="http://osm.org">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/">CARTO</a>'
+                },
+                baseLayer: new maptalks.TileLayer('base', {
+                    urlTemplate: 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+                    subdomains: ['a', 'b', 'c', 'd']
+                })
+            });
+            var flayer = new maptalks.esri.FeatureLayer('flayer','http://117.36.75.134:6080/arcgis/rest/services/LT/WBJ/FeatureServer/1',{
+                symbol:{
+                    markerFile:'images/apple.png'
+                }
+            });
+            flayer.addTo(map);
+            var features =[{
+                "geometry" : {"x" : 114.25, "y" : 33.80},      
+                "attributes" : {
+                   "id" : "1",
+                   "name" : "Joe Smith"
+                }
+              },
+              {
+                "geometry" : { "x" : 114.27, "y" : 34.086 },      
+                "attributes" : {
+                  "id" : "2",
+                  "name" : "John Doe"
+                 }
+              }
+            ];
+            flayer.addFeatures(features,function(res){
+                console.log(res);
+            });
+        </script>
+    </body>
+
+    </html>
