@@ -102,25 +102,6 @@ export default class FeatureService extends Service{
         return this._queryTask.run();
     }
     
-    /**
-     *features为geojson，格式如下:
-     [{
-        "geometry" : {"x" : 113.25, "y" : 33.80},      
-        "attributes" : {
-        "id" : "1",
-        "name" : "Joe Smith"
-       }
-     },
-      {
-     "geometry" : { "x" : 113.27, "y" : 34.086 },      
-     "attributes" : {
-       "id" : "2",
-       "name" : "John Doe"
-      }
-     }
-    ]
-    参考http://resources.arcgis.com/en/help/arcgis-rest-api/#/Add_Features/02r30000010m000000/
-     */
     addFeatures(features) {
        const params = this._AddParams(features);
        this._FeaturesTask=this._FeaturesTask||new FeaturesTask(this);

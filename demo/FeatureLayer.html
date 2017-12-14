@@ -36,9 +36,14 @@
             var flayer = new maptalks.esri.FeatureLayer('flayer','http://117.36.75.134:6080/arcgis/rest/services/LT/WBJ/FeatureServer/1',{
                 symbol:{
                     markerFile:'images/apple.png'
+                    lineColor: 'red'
                 }
             });
             flayer.addTo(map);
+            flayer.on('loadend', function (e) {
+                var geometries = e.geometries;
+                console.log(geometries.length);
+            });
             var features =[{
                 "geometry" : {"x" : 114.25, "y" : 33.80},      
                 "attributes" : {
@@ -54,6 +59,7 @@
                  }
               }
             ];
+            //增加要素
             flayer.addFeatures(features,function(res){
                 console.log(res);
             });
