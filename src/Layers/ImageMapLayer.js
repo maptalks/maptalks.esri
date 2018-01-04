@@ -24,10 +24,15 @@ export default class ImageMapLayer extends maptalks.Layer {
         this._service = new ImageService(this._url);
     }
 
-    onLoad() {
-        if (this.cacheData) {
-            return true;
+    getEvents() {
+        return {
+            'zoomend': function () {
+                this._reLoad();
+            }
         }
+    }
+
+    _reLoad() {
         //export image 用于render
         const params = this._buildExportParams();
         this._service.exportImage(params).then(resp => {
@@ -43,32 +48,48 @@ export default class ImageMapLayer extends maptalks.Layer {
         return false;
     }
 
+    onLoad() {
+        if (this.cacheData) {
+            return true;
+        }
+        this._reLoad();
+    }
+
     get cacheData() {
         return this._cacheData;
     }
 
     get tin() {
         return {
-            w:this._width,
-            h:this._height,
+            w: this._width,
+            h: this._height,
             vertices: this._vertices,
             triangles: this._triangles
         };
     }
 
     _buildExportParams() {
-        //空的params
-        const map = this.getMap(),
-            params = {},
-            prjExtent = map.getProjExtent(),
+        const params = {},
+            map = this.getMap(),
+            glZoom = map.getZoom(),
+            geoExtent = map.getExtent(),
             mapSize = map.getSize();
-        params.bbox = [prjExtent.xmin, prjExtent.ymin, prjExtent.xmax, prjExtent.ymax];
-        params.size = mapSize.width + ',' + mapSize.height;
+        //
+        params.bbox = this._options.extent || [geoExtent.xmin, geoExtent.ymin, geoExtent.xmax, geoExtent.ymax];
+        //计算size
+        const min = new maptalks.Coordinate(params.bbox[0], params.bbox[1]);
+        const ptMin = map.coordinateToPoint(min, glZoom);
+        const max = new maptalks.Coordinate(params.bbox[2], params.bbox[3]);
+        const ptMax = map.coordinateToPoint(max, glZoom);
+        const w = Math.floor(ptMax.x - ptMin.x),
+            h = Math.abs(Math.floor(ptMax.y - ptMin.y));
+        params.size = w + ',' + h;
         params.format = this._options.format;
         params.transparent = this._options.transparent;
         //}{axmand debug
-        params.bboxSR = '';
-        params.imageSR = '';
+        params.bboxSR = '4326';
+        //强制要求是4326
+        params.imageSR = '4326';
         return params;
     }
 
@@ -175,7 +196,7 @@ ImageMapLayer.registerRenderer('gl', class extends maptalks.renderer.ImageGLRend
             img.crossOrigin = 'anonymous';
             img.onload = function () {
                 const nw = new maptalks.Coordinate(imgObj.extent.xmin, imgObj.extent.ymax);
-                const pt = that.layer.getMap()._prjToPoint(nw, glZoom);
+                const pt = that.layer.getMap().coordinateToPoint(nw, glZoom);
                 const vtcs = [],
                     txcoord = [];
                 for (let i = 0; i < len; i++) {
