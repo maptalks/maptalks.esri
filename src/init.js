@@ -3,10 +3,12 @@
  */
 import ImageMapLayer from './Layers/ImageMapLayer';
 import FeatureLayer from './Layers/FeatureLayer';
+import GeometryService from './Services/GeometryService';
 
 const esri = {
     ImageMapLayer : ImageMapLayer,
-    FeatureLayer : FeatureLayer
+    FeatureLayer : FeatureLayer,
+    GeometryService :GeometryService
 }
 
 

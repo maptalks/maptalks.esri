@@ -3,13 +3,13 @@ import Task from './Task';
 import merge from './../Utils/merge';
 
 /**
- * @class ExportImageTask
+ * @class Support BufferTask
  */
-class QueryTask extends Task{
+class BufferTask extends Task{
 
     constructor(service,params){
         super(service,params);
-        this._path = 'query';
+        this._path = 'buffer';
     }
 
     set params(value={}){
@@ -22,4 +22,4 @@ class QueryTask extends Task{
 
 }
 
-export default QueryTask;
+export default BufferTask;
