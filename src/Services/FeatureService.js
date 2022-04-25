@@ -1,7 +1,5 @@
 
 import cors from './../Utils/cors';
-import cleanUrl from './../Utils/cleanUrl';
-import {Ajax} from 'maptalks';
 import Service from './Service';
 import MetadataTask from './../Support/MetadataTask';
 import QueryTask from './../Support/QueryTask';
@@ -12,10 +10,11 @@ import FeaturesTask from './../Support/FeaturesTask';
  * default ImageService options
  */
 const options = {
-    proxy:false,
-    useCors:cors,
-    timeout:0
-}
+    proxy: false,
+    useCors: cors,
+    timeout: 0
+};
+
 /**
  * imageService对应arcgis发布的的supported operations
  * -Export Image
@@ -53,7 +52,7 @@ export default class FeatureService extends Service{
             returnGeometry: option.returnGeometry || true,
             maxAllowableOffset: option.maxAllowableOffset||'',
             outSR: option.outSR || '',
-            text:option.text||'',
+            text: option.text||'',
             outFields: option.outFields || '*'
         };
         return condition;
@@ -62,35 +61,36 @@ export default class FeatureService extends Service{
     _AddParams(features) {
         return {
             features: features,
-            gdbVersion:'',
+            gdbVersion: '',
             rollbackOnFailure: true,
-            f:'pjson'
+            f: 'pjson'
         }
     }
 
     _UpdateParams(features) {
        return {
             features: features,
-            gdbVersion:'',
+            gdbVersion: '',
             rollbackOnFailure: true,
-            f:'pjson'
+            f: 'pjson'
         } 
     }
 
    _deleteParams(option) {
         if(option.objectIds) {
             return {
-                objectIds:option.objectIds,
-                f:'pjson'
+                objectIds: option.objectIds,
+                f: 'pjson'
             }
         } else {
+            const geometry = option.geometry;
             return {
                 where: option.where || '1=1',
                 geometry: (geometry instanceof Object) ? JSON.stringify(geometry) : geometry,
                 geometryType: option.geometryType || 'esriGeometryPoint',
                 inSR: option.inSR || '',
                 spatialRel: option.esriSpatialRelIntersects || 'esriSpatialRelIntersects',
-                f:'pjson'
+                f: 'pjson'
             };
         }
    }

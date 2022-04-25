@@ -7,7 +7,7 @@ import { Ajax } from 'maptalks';
 /**
  * default task options
  */
-const options = {
+const taskOptions = {
     proxy: false,
     useCors: cors
 }

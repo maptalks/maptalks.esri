@@ -13,7 +13,11 @@ const options = {
     f: 'image',
 };
 
+const TEMP_EXTENT = new maptalks.Extent();
 const TEMP_COORD = new maptalks.Coordinate(0, 0);
+const TEMP_POINT = new maptalks.Point(0, 0);
+const TEMP_POINT2 = new maptalks.Point(0, 0);
+const BBOX = [];
 
 export default class ImageMapLayer extends maptalks.ImageLayer {
 
@@ -65,27 +69,31 @@ export default class ImageMapLayer extends maptalks.ImageLayer {
         const params = {},
             map = this.getMap(),
             mapExtent = map.getExtent();
-        const paramExtent = this.options.extent && new maptalks.Extent(this.options.extent);
+        const paramExtent = this.options.extent && TEMP_EXTENT.set(...this.options.extent);
 
         const extent = paramExtent ? paramExtent.intersection(mapExtent) : mapExtent;
 
-        params.bbox = [extent.xmin, extent.ymin, extent.xmax, extent.ymax];
+        BBOX[0] = extent.xmin;
+        BBOX[1] = extent.ymin;
+        BBOX[2] = extent.xmax;
+        BBOX[3] = extent.ymax;
+        params.bbox = BBOX;
         //计算size
-        const min = new maptalks.Coordinate(params.bbox[0], params.bbox[1]);
-        const ptMin = map.coordToContainerPoint(min);
-        const max = new maptalks.Coordinate(params.bbox[2], params.bbox[3]);
-        const ptMax = map.coordToContainerPoint(max);
-        const w = Math.floor(ptMax.x - ptMin.x),
+        const min = TEMP_COORD.set(params.bbox[0], params.bbox[1]);
+        const ptMin = map.coordToContainerPoint(min, null, TEMP_POINT);
+        const max = TEMP_COORD.set(params.bbox[2], params.bbox[3]);
+        const ptMax = map.coordToContainerPoint(max, null, TEMP_POINT2);
+        const w = Math.abs(Math.floor(ptMax.x - ptMin.x)),
             h = Math.abs(Math.floor(ptMax.y - ptMin.y));
         params.size = w + ',' + h;
         params.format = this.options.format;
         params.transparent = this.options.transparent;
         const projection = map.getProjection();
         //}{axmand debug
-        params.bboxSR = '4326';
+        params.bboxSR = this.options.bboxSR || '4326';
         //强制要求是4326
         const code = projection.code;
-        params.imageSR = code.substring('EPSG:'.length);
+        params.imageSR = this.options.imageSR || code.substring('EPSG:'.length);
         return params;
     }
 }

@@ -50,7 +50,7 @@ class Service {
         //1.构造请求
         let url = this._options.proxy ? this._options.proxy + '?' + this._url + path : this._url + path;
         //2.合并请求参数
-        params = !!this._token ? merge({}, params, { token: this._token }) : merge({}, params);
+        params = this._token ? merge({}, params, { token: this._token }) : merge({}, params);
         //3.发出请求
         method = method.toLowerCase();
         //4.根据method发出请求
@@ -68,7 +68,7 @@ class Service {
             });
         } else if (method === 'post') {
             return new Promise(function (resolve, reject) {
-                Ajax.post({url:url}, serializeParams(params), (err,resp) => {
+                Ajax.post({ url }, serializeParams(params), (err,resp) => {
                     err===null?resolve(resp):reject(err);
                 });
             });

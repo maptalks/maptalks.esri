@@ -7,7 +7,7 @@ import FeatureService from './../Services/FeatureService';
 import merge from './../Utils/merge';
 
 const _options = {
-    renderer:'canvas'
+    renderer: 'canvas'
 };
 
 export default class FeatureLayer extends maptalks.VectorLayer {
@@ -29,7 +29,7 @@ export default class FeatureLayer extends maptalks.VectorLayer {
             const geos = this._createGeometries(data.features, data.geometryType);
             this.load();
             this.addGeometry(geos);
-            this.fire('loadend',{geometries:geos});
+            this.fire('loadend',{ geometries: geos });
         }, err => {
             console.log(err);
         });
@@ -132,8 +132,8 @@ export default class FeatureLayer extends maptalks.VectorLayer {
         const symbol = this._options.symbol||undefined;
         features.forEach(function(feature){
            geometries.push(new maptalks.Marker(feature.geometry,{
-                symbol:symbol,
-                properties:feature.attributes
+                symbol: symbol,
+                properties: feature.attributes
             }));
         }.bind(this));
         return geometries; 
@@ -141,11 +141,11 @@ export default class FeatureLayer extends maptalks.VectorLayer {
 
     _createLineString(features) {
         const geometries = [];
-        const symbol = this._options.symbol||{lineColor:'red'};
+        const symbol = this._options.symbol||{ lineColor:'red' };
         features.forEach(function(feature){
            geometries.push(new maptalks.MultiLineString(feature.geometry.paths,{
-                symbol:symbol,
-                properties:feature.attributes
+                symbol: symbol,
+                properties: feature.attributes
             }));
         }.bind(this));
         return geometries;
@@ -156,8 +156,8 @@ export default class FeatureLayer extends maptalks.VectorLayer {
         const symbol = this._options.symbol||{lineColor:'red'};
         features.forEach(function(feature){
            geometries.push(new maptalks.Polygon(feature.geometry.rings,{
-                symbol:symbol,
-                properties:feature.attributes
+                symbol: symbol,
+                properties: feature.attributes
             }));
         }.bind(this));
         return geometries;
