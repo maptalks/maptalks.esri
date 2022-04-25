@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
     <html lang="en">
 
     <head>
@@ -7,8 +7,7 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>Document</title>
         <!-- maptalks -->
-        <link rel="stylesheet" href="./../node_modules/maptalks/dist/maptalks.css">
-        <script src="./../node_modules/maptalks/dist/maptalks.js"></script>
+        <script src="/maptalks/dist/maptalks.js"></script>
         <!-- maptalks.esri -->
         <script src="../dist/maptalks.esri.js"></script>
     </head>
@@ -19,7 +18,7 @@
         <script type="text/javascript">
             // default map object
             var map = new maptalks.Map('mapDiv', {
-                center: [114.01135452865041,30.277598289839012],
+                center: [-122.23, 37.75],
                 zoom: 10,
                 attribution: {
                     content: '&copy; <a href="http://osm.org">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/">CARTO</a>'
@@ -29,11 +28,13 @@
                     subdomains: ['a', 'b', 'c', 'd']
                 })
             });
+            const extent = map.getExtent();
             //esri imagelayer
             var imageLayer = new maptalks.esri.ImageMapLayer('imagemaplayer',{
                 renderer : 'gl',
-                extent:[114.01135452865041,29.977598289839012,114.69833550031375,30.66457926150234],
-                url: 'http://172.16.100.20:6080/arcgis/rest/services/chidren_hot/ImageServer'
+                // extent: [114.01135452865041,29.977598289839012,114.69833550031375,30.66457926150234],
+                extent: [extent.xmin, extent.ymin, extent.xmax, extent.ymax],
+                url: 'https://landsat.arcgis.com/arcgis/rest/services/Landsat/PS/ImageServer'
             });
             //
             map.addLayer(imageLayer);
