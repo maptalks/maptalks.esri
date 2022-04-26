@@ -30,15 +30,47 @@ export default class ImageMapLayer extends maptalks.ImageLayer {
 
     getEvents() {
         return {
-            'zoomend moveend rotateend': function () {
+            'zoomend': function () {
+                this._currentParamString = null;
+                this._reLoad();
+            },
+            'moveend rotateend': function () {
                 this._reLoad();
             }
         }
     }
 
-    _reLoad() {
-        //export image 用于render
+    _reLoadOnZoomEnd() {
         const params = this._buildExportParams();
+
+        const renderer = this.getRenderer();
+        if (this._requesting || renderer && renderer.isLoadingResource()) {
+            this._lastParams = params;
+            return;
+        }
+        //export image 用于render
+        this._requestImage(params);
+    }
+
+    _reLoad() {
+        const params = this._buildExportParams();
+
+        const renderer = this.getRenderer();
+        if (this._requesting || renderer && renderer.isLoadingResource()) {
+            // this._lastParams = params;
+            return;
+        }
+        //export image 用于render
+        this._requestImage(params);
+    }
+
+    _requestImage(params) {
+        const paramString = JSON.stringify(params);
+        if (paramString === this._currentParamString) {
+            return;
+        }
+        this._requesting = true;
+        this._currentParamString = paramString;
         this._service.exportImage(params).then(resp => {
             //获取结果图片地址
             const image = JSON.parse(resp);
@@ -49,6 +81,11 @@ export default class ImageMapLayer extends maptalks.ImageLayer {
             image.extent = [e.xmin, e.ymin, e.xmax, e.ymax];
             this._esriImages[0] = image;
             this.setImages(this._esriImages);
+            this._requesting = false;
+            if (this._lastParams) {
+                this._requestImage(this._lastParams);
+                delete this._lastParams;
+            }
             const renderer = this.getRenderer();
             if (renderer) {
                 renderer.setToRedraw();
@@ -56,7 +93,6 @@ export default class ImageMapLayer extends maptalks.ImageLayer {
         }, err => {
             console.log(err);
         });
-        return true;
     }
 
     onAdd() {
@@ -71,7 +107,7 @@ export default class ImageMapLayer extends maptalks.ImageLayer {
             mapExtent = map.getExtent();
         const paramExtent = this.options.extent && TEMP_EXTENT.set(...this.options.extent);
 
-        const extent = paramExtent ? paramExtent.intersection(mapExtent) : mapExtent;
+        const extent = paramExtent || mapExtent;
 
         BBOX[0] = extent.xmin;
         BBOX[1] = extent.ymin;
