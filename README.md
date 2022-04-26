@@ -2,6 +2,11 @@
 
 A plugin to load ArcGIS service.
 
+## Demo
+
+* [FeatureLayerService's Demo](https://maptalks.org/maptalks.esri/demo/FeatureLayer.html)
+* [ImageMapLayer's Demo](https://maptalks.org/maptalks.esri/demo/ImageLayer.html)
+
 ## Install
 
 ```shell
@@ -84,8 +89,3 @@ var imageLayer = new maptalks.esri.ImageMapLayer('imagemaplayer',{
 
 map.addLayer(imageLayer);
 ```
-
-## Demo
-
-* [FeatureLayerService's Demo](https://maptalks.org/maptalks.esri/demo/FeatureLayer.html)
-* [ImageMapLayer's Demo](https://maptalks.org/maptalks.esri/demo/ImageLayer.html)
