@@ -25,8 +25,8 @@ export default class FeatureService {
     query(option) {
         return this._service.query(option).then(resp => {
             const data = JSON.parse(resp);
-            const geos = this._createGeometries(data.features, data.geometryType);
-            return geos;
+            // const geos = this._createGeometries(data.features, data.geometryType);
+            return data;
         });
     }
 
@@ -76,22 +76,21 @@ export default class FeatureService {
         });
     }
 
-    _createGeometries(features, type) {
-        let geometries = null;
+    toGeometry(data) {
+        if (!data) {
+            return [];
+        }
+        const { features, geometryType: type } = data;
         switch(type) {
             case 'esriGeometryPoint':
-                  geometries = this._createPoint(features);
-                  break;
+                  return this._createPoint(features);
             case 'esriGeometryPolyline':
-                  geometries = this._createLineString(features);
-                  break;
+                  return this._createLineString(features);
             case 'esriGeometryPolygon':
-                  geometries = this._createPolygon(features);
-                  break;
+                  return this._createPolygon(features);
             default:
                   break;
         }
-        return geometries;
     }
 
     _createPoint(features) {
