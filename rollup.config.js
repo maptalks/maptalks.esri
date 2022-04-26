@@ -48,7 +48,7 @@ module.exports = [
                     'maptalks': 'maptalks'
                 },
                 extend: true,
-                'name': 'maptalks',
+                'name': 'maptalks.esri',
                 'sourcemap': production ? false : 'inner',
                 'format': 'umd',
                 'banner': banner,
