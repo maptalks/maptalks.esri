@@ -38,7 +38,7 @@ module.exports = [
                     'maptalks': 'maptalks'
                 },
                 extend: true,
-                'sourcemap': production ? false : 'inner',
+                'sourcemap': true,
                 'format': 'es',
                 'banner': banner,
                 'file': pkg.module
@@ -49,7 +49,7 @@ module.exports = [
                 },
                 extend: true,
                 'name': 'maptalks.esri',
-                'sourcemap': production ? false : 'inner',
+                'sourcemap': true,
                 'format': 'umd',
                 'banner': banner,
                 'file': pkg.main

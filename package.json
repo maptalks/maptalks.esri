@@ -12,7 +12,9 @@
   },
   "files": [
     "dist/maptalks.esri.mjs",
-    "dist/maptalks.esri.js"
+    "dist/maptalks.esri.mjs.map",
+    "dist/maptalks.esri.js",
+    "dist/maptalks.esri.js.map"
   ],
   "repository": {
     "type": "git",
