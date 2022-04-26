@@ -1,6 +1,6 @@
 {
   "name": "maptalks.esri",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A maptalks plugin to load ESRI services",
   "main": "dist/maptalks.esri.js",
   "module": "dist/maptalks.esri.mjs",
