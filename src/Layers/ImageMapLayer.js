@@ -116,9 +116,9 @@ export default class ImageMapLayer extends maptalks.ImageLayer {
         params.bbox = BBOX;
         //计算size
         const min = TEMP_COORD.set(params.bbox[0], params.bbox[1]);
-        const ptMin = map.coordToContainerPoint(min, null, TEMP_POINT);
+        const ptMin = map.coordToPoint(min, null, TEMP_POINT);
         const max = TEMP_COORD.set(params.bbox[2], params.bbox[3]);
-        const ptMax = map.coordToContainerPoint(max, null, TEMP_POINT2);
+        const ptMax = map.coordToPoint(max, null, TEMP_POINT2);
         const w = Math.abs(Math.floor(ptMax.x - ptMin.x)),
             h = Math.abs(Math.floor(ptMax.y - ptMin.y));
         params.size = w + ',' + h;
