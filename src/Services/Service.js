@@ -2,9 +2,10 @@
 import merge from './../Utils/merge';
 import cors from './../Utils/cors';
 import cleanUrl from './../Utils/cleanUrl';
-import { Ajax } from 'maptalks';
+import { Ajax, Util } from 'maptalks';
 import serializeParams from './../Utils/serializeParams';
 import Promise from './../Utils/Promise';
+import { hasService, outService, pushService } from '../servicequeryqueue';
 
 const _options = {
     proxy: false,
@@ -30,8 +31,10 @@ class Service {
         //合并，更新options
         this._options = merge({}, _options, options);
         this._url = cleanUrl(url);
-        this._token = this._options.token||null;
+        this._token = this._options.token || null;
+        this.id = Util.GUID();
     }
+
     /**
      * 设置token，用于授权验证
      * @param {String} token 
@@ -53,23 +56,38 @@ class Service {
         params = this._token ? merge({}, params, { token: this._token }) : merge({}, params);
         //3.发出请求
         method = method.toLowerCase();
+
+        //current query 
+        const queryId = `${Util.GUID()}_${new Date().getTime()}`
+        this.queryId = queryId;
+        pushService(Util.extend({}, this));
+
+        const resolveCallback = (resolve, resp) => {
+            //不包含该次的查询，说明其已经被新的query替代无需 resolve
+            if (hasService(this, queryId)) {
+                resolve(resp);
+                outService(this);
+            } else {
+                // console.warn(`${queryId} task is Discard`);
+            }
+        };
         //4.根据method发出请求
         if (method === 'get' && !this._options.useCors) {
             return new Promise(function (resolve, reject) {
-                Ajax.jsonp(url + '?' + serializeParams(params), (err,resp) => {
-                    err===null?resolve(resp):reject(err);
+                Ajax.jsonp(url + '?' + serializeParams(params), (err, resp) => {
+                    err === null ? resolveCallback(resolve, resp) : reject(err);
                 });
             });
         } else if (method === 'get') {
             return new Promise(function (resolve, reject) {
-                Ajax.get(url + '?' + serializeParams(params), (err,resp) => {
-                    err===null?resolve(resp):reject(err);
+                Ajax.get(url + '?' + serializeParams(params), (err, resp) => {
+                    err === null ? resolveCallback(resolve, resp) : reject(err);
                 });
             });
         } else if (method === 'post') {
             return new Promise(function (resolve, reject) {
-                Ajax.post({ url }, serializeParams(params), (err,resp) => {
-                    err===null?resolve(resp):reject(err);
+                Ajax.post({ url }, serializeParams(params), (err, resp) => {
+                    err === null ? resolveCallback(resolve, resp) : reject(err);
                 });
             });
         }
