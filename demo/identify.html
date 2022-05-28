@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>IdentifyService</title>
+    <!-- maptalks -->
+    <script src="https://unpkg.com/maptalks/dist/maptalks.js"></script>
+    <script src="https://unpkg.com/gcoord@0.3.2/dist/gcoord.js"></script>
+    <!-- maptalks.esri -->
+    <script src="../dist/maptalks.esri.js"></script>
+</head>
+
+<body>
+    <!--map document div-->
+    <div id='mapDiv' style="width:800px;height:600px;" class="container"> </div>
+    <script type="text/javascript">
+        const center = gcoord.transform([-13058436.429001378, 4061960.791646459], gcoord.WebMercator, gcoord.WGS84);
+        // default map object
+        var map = new maptalks.Map('mapDiv', {
+            center: center,
+            zoom: 11,
+            attribution: {
+                content: '&copy; <a href="http://osm.org">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/">CARTO</a>'
+            },
+            baseLayer: new maptalks.TileLayer('base', {
+                urlTemplate: 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+                subdomains: ['a', 'b', 'c', 'd']
+            })
+        });
+        var service = new maptalks.esri.IdentifyService({
+            url: 'https://sampleserver6.arcgisonline.com/arcgis/rest/services/MtBaldy_BaseMap/MapServer/identify',
+            debug: true,
+            map
+        });
+
+        const layer = new maptalks.VectorLayer('polygon').addTo(map);
+        function query(e) {
+            // const extent = map.getExtent();
+            // const geometry = [extent.xmin, extent.ymin, extent.xmax, extent.ymax].join(',');
+            const coordinate = e.coordinate;
+            const geometry = { x: coordinate.x, y: coordinate.y };
+            service.query({
+                geometry,
+                geometryType: 'esriGeometryPoint',
+                tolerance: 1,
+            }).then(json => {
+                json = JSON.parse(json);
+                console.log('fetures count:', json.results.length);
+                const geometries = json.results.map(d => {
+                    return createGeometry(d);
+                });
+                layer.clear();
+                layer.addGeometry(geometries);
+                // map.setCenterAndZoom(extent.getCenter(), zoom);
+            });
+        }
+        map.on('click', query);
+
+
+        function createGeometry(d) {
+            const { geometry, geometryType: type } = d;
+            let geom;
+            switch (type) {
+                case 'esriGeometryPoint':
+                    return new maptalks.Marker(geometry);
+                case 'esriGeometryPolyline':
+                    var symbol = {
+                        lineColor: 'red'
+                    }
+                    if (Array.isArray(geometry.paths[0][0])) {
+                        geom = new maptalks.MultiLineString(geometry.paths, { symbol });
+                    } else {
+                        geom = new maptalks.LineString(geometry.paths, { symbol });
+                    }
+                    break;
+                case 'esriGeometryPolygon':
+                    var symbol = {
+                        polygonFill: 'blue'
+                    }
+                    geom = new maptalks.MultiPolygon([geometry.rings], { symbol });
+                default:
+                    break;
+            }
+            console.log(geom);
+            return geom;
+        }
+    </script>
+</body>
+
+</html>
