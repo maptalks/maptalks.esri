@@ -5,7 +5,7 @@ A plugin to load ArcGIS service.
 ## Demo
 
 * [FeatureLayerService's Demo](https://maptalks.org/maptalks.esri/demo/FeatureLayer.html)
-* [ImageMapLayer's Demo](https://maptalks.org/maptalks.esri/demo/ImageLayer.html)
+* [ImageLayerService Demo](https://maptalks.org/maptalks.esri/demo/ImageLayer.html)
 
 ## Install
 
@@ -21,16 +21,16 @@ npm i maptalks.esri --save
 <script src="https://unpkg.com/maptalks.esri/dist/maptalks.esri.js"></script>
 <script type="text/javascript">
     const service = new maptalks.esri.FeatureLayerService(/* params */);
-    const imageLayer = new maptalks.esri.ImageMapLayer(/* params */);
+    const service1 = new maptalks.esri.ImageLayerService(/* params */);
 </script>
 ```
 
 ### ESM Module
 
 ```js
-import { FeatureLayerService, ImageMapLayer } from 'maptalks.esri';
+import { FeatureLayerService, ImageLayerService } from 'maptalks.esri';
 const service = new FeatureLayerService(/* params */);
-const imageLayer = new ImageMapLayer(/* params */);
+const service1 = new ImageLayerService(/* params */);
 ```
 
 ## Code samples
@@ -41,7 +41,7 @@ const imageLayer = new ImageMapLayer(/* params */);
 const service = new maptalks.esri.FeatureLayerService({
     url: 'https://sampleserver6.arcgisonline.com/arcgis/rest/services/Earthquakes_Since1970/MapServer/0',
     // 数据的坐标系，不设置时则默认使用map的坐标系，如果设置，则会按该坐标系转换为map的坐标系
-    projection: 'EPSG:3857',
+    // projection: 'EPSG:3857',
     symbol: {
         markerType: 'ellipse',
         markerWidth: 12,
@@ -56,36 +56,53 @@ const service = new maptalks.esri.FeatureLayerService({
 const pointLayer = new maptalks.PointLayer('polygon');
 const groupLayer = new maptalks.GroupGLLayer('group', [pointLayer]).addTo(map);
 
-service.query().then(features => {
-    const geometries = service.toGeometry(features);
-    pointLayer.addGeometry(geometries);
-    const extent = pointLayer.getExtent();
-    const zoom = map.getFitZoom(extent);
-    map.setCenterAndZoom(extent.getCenter(), zoom);
-});
+function query() {
+    const extent = map.getExtent();
+    const geometry = [extent.xmin, extent.ymin, extent.xmax, extent.ymax].join(',');
+    service.query({
+        geometry: geometry,
+        geometryType: 'esriGeometryEnvelope'
+    }).then(json => {
+        console.log('fetures count:', json.features.length);
+        const geometries = service.toGeometry(json);
+        pointLayer.clear();
+        pointLayer.addGeometry(geometries);
+                // map.setCenterAndZoom(extent.getCenter(), zoom);
+    });
+}
+map.on('viewchange', query);
+query();
 ```
 
 ### Load Image Map Service
 
 ```js
-var map = new maptalks.Map('mapDiv', {
-    center: [-122.23, 37.75],
-    zoom: 10,
-    attribution: {
-        content: '&copy; <a href="http://osm.org">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/">CARTO</a>'
-    },
-    baseLayer: new maptalks.TileLayer('base', {
-        urlTemplate: 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-        subdomains: ['a', 'b', 'c', 'd']
-    })
-});
-const extent = map.getExtent();
-//esri imagelayer
-var imageLayer = new maptalks.esri.ImageMapLayer('imagemaplayer',{
-    renderer : 'gl',
-    extent: [extent.xmin, extent.ymin, extent.xmax, extent.ymax],
-    url: 'https://landsat.arcgis.com/arcgis/rest/services/Landsat/PS/ImageServer'
+
+var service = new maptalks.esri.ImageLayerService({
+    url: 'https://sampleserver6.arcgisonline.com/arcgis/rest/services/PoolPermits/MapServer/export',
+    debug: true,
+    map,
+    // 数据的坐标系，不设置时则默认使用map的坐标系，如果设置，则会按该坐标系转换为map的坐标系
+    // projection: 'EPSG:3857',
 });
 
-map.addLayer(imageLayer);
+ var imageLayer = new maptalks.ImageLayer('imagemaplayer');
+ map.addLayer(imageLayer);
+
+function query() {
+    service.query().then(json => {
+        json = JSON.parse(json);
+        if (json.href) {
+            const extent = map.getExtent();
+            const geometry = [extent.xmin, extent.ymin, extent.xmax, extent.ymax];
+            imageLayer.setImages([{
+                url: json.href,
+                    extent: geometry
+                }]);
+        }
+    })
+}
+
+ map.on('viewchange', query);
+ query();
 ```
