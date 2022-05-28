@@ -1,81 +1,70 @@
 <!DOCTYPE html>
-    <html lang="en">
+<html lang="en">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>FeatureLayerService</title>
-        <!-- maptalks -->
-        <script src="https://unpkg.com/maptalks/dist/maptalks.js"></script>
-        <!-- maptalks.esri -->
-        <script src="https://unpkg.com/maptalks.esri/dist/maptalks.esri.js"></script>
-        <script src="https://unpkg.com/@maptalks/gl/dist/maptalksgl.js"></script>
-        <script src="https://unpkg.com/@maptalks/vt/dist/maptalks.vt.js"></script>
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>FeatureLayerService</title>
+    <!-- maptalks -->
+    <script src="https://unpkg.com/maptalks/dist/maptalks.js"></script>
+    <!-- maptalks.esri -->
+    <script src="https://unpkg.com/maptalks.esri/dist/maptalks.esri.js"></script>
+    <script src="https://unpkg.com/@maptalks/gl/dist/maptalksgl.js"></script>
+    <script src="https://unpkg.com/@maptalks/vt/dist/maptalks.vt.js"></script>
+</head>
 
-    <body>
-        <!--map document div-->
-        <div id='mapDiv' style="width:800px;height:600px;" class="container"> </div>
-        <script type="text/javascript">
-            // default map object
-            var map = new maptalks.Map('mapDiv', {
-                center:[-122.479, 37.837],
-                zoom: 8,
-                attribution: {
-                    content: '&copy; <a href="http://osm.org">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/">CARTO</a>'
-                },
-                baseLayer: new maptalks.TileLayer('base', {
-                    urlTemplate: 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-                    subdomains: ['a', 'b', 'c', 'd']
-                })
-            });
-            var service = new maptalks.esri.FeatureLayerService({
-                url: 'https://sampleserver6.arcgisonline.com/arcgis/rest/services/Earthquakes_Since1970/MapServer/0',
-                // 数据的坐标系，不设置时则默认使用map的坐标系，如果设置，则会按该坐标系转换为map的坐标系
-                // projection: 'EPSG:3857',
-                symbol: {
-                    markerType: 'ellipse',
-                    markerWidth: 12,
-                    markerHeight: 12,
-                    markerFill: '#f00',
-                    markerFillOpacity: 0.5,
-                    markerLineColor: '#000',
-                    markerLineWidth: 2
-                }
-            });
+<body>
+    <!--map document div-->
+    <div id='mapDiv' style="width:800px;height:600px;" class="container"> </div>
+    <script type="text/javascript">
+        // default map object
+        var map = new maptalks.Map('mapDiv', {
+            center: [66.06970110501516, 35.542725505590255],
+            zoom: 6,
+            attribution: {
+                content: '&copy; <a href="http://osm.org">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/">CARTO</a>'
+            },
+            baseLayer: new maptalks.TileLayer('base', {
+                urlTemplate: 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+                subdomains: ['a', 'b', 'c', 'd']
+            })
+        });
+        var service = new maptalks.esri.FeatureLayerService({
+            url: 'https://sampleserver6.arcgisonline.com/arcgis/rest/services/Earthquakes_Since1970/MapServer/0',
+            debug: true,
+            // 数据的坐标系，不设置时则默认使用map的坐标系，如果设置，则会按该坐标系转换为map的坐标系
+            // projection: 'EPSG:3857',
+            symbol: {
+                markerType: 'ellipse',
+                markerWidth: 12,
+                markerHeight: 12,
+                markerFill: '#f00',
+                markerFillOpacity: 0.5,
+                markerLineColor: '#000',
+                markerLineWidth: 2
+            }
+        });
 
-            const pointLayer = new maptalks.PointLayer('polygon');
-            const groupLayer = new maptalks.GroupGLLayer('group', [pointLayer]).addTo(map);
-
-            service.query().then(features => {
-                const geometries = service.toGeometry(features);
+        const pointLayer = new maptalks.PointLayer('polygon');
+        const groupLayer = new maptalks.GroupGLLayer('group', [pointLayer]).addTo(map);
+        function query() {
+            const extent = map.getExtent();
+            const geometry = [extent.xmin, extent.ymin, extent.xmax, extent.ymax].join(',');
+            service.query({
+                geometry: geometry,
+                geometryType: 'esriGeometryEnvelope'
+            }).then(json => {
+                console.log('fetures count:', json.features.length);
+                const geometries = service.toGeometry(json);
+                pointLayer.clear();
                 pointLayer.addGeometry(geometries);
-                const extent = pointLayer.getExtent();
-                const zoom = map.getFitZoom(extent);
-                map.setCenterAndZoom(extent.getCenter(), zoom);
+                // map.setCenterAndZoom(extent.getCenter(), zoom);
             });
+        }
+        query();
+        map.on('viewchange', query);
+    </script>
+</body>
 
-            // var features =[{
-            //     "geometry" : {"x" : 114.25, "y" : 33.80},
-            //     "attributes" : {
-            //        "id" : "1",
-            //        "name" : "Joe Smith"
-            //     }
-            //   },
-            //   {
-            //     "geometry" : { "x" : 114.27, "y" : 34.086 },
-            //     "attributes" : {
-            //       "id" : "2",
-            //       "name" : "John Doe"
-            //      }
-            //   }
-            // ];
-            // //增加要素
-            // flayer.addFeatures(features,function(res){
-            //     console.log(res);
-            // });
-        </script>
-    </body>
-
-    </html>
+</html>

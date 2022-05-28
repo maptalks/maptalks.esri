@@ -1,44 +1,64 @@
 <!DOCTYPE html>
-    <html lang="en">
+<html lang="en">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>ImageMapLayer</title>
-        <!-- maptalks -->
-        <script src="https://unpkg.com/maptalks/dist/maptalks.js"></script>
-        <!-- maptalks.esri -->
-        <script src="https://unpkg.com/maptalks.esri/dist/maptalks.esri.js"></script>
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>ImageMapLayer</title>
+    <!-- maptalks -->
+    <script src="https://unpkg.com/maptalks/dist/maptalks.js"></script>
+    <script src="https://unpkg.com/gcoord@0.3.2/dist/gcoord.js"></script>
+    <!-- maptalks.esri -->
+    <script src="https://unpkg.com/maptalks.esri/dist/maptalks.esri.js"></script>
+</head>
 
-    <body>
-        <!--map document div-->
-        <div id='mapDiv' style="width:800px;height:600px;" class="container"> </div>
-        <script type="text/javascript">
-            // default map object
-            var map = new maptalks.Map('mapDiv', {
-                center: [-122.23, 37.75],
-                zoom: 10,
-                attribution: {
-                    content: '&copy; <a href="http://osm.org">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/">CARTO</a>'
-                },
-                baseLayer: new maptalks.TileLayer('base', {
-                    urlTemplate: 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-                    subdomains: ['a', 'b', 'c', 'd']
-                })
-            });
-            const extent = map.getExtent();
-            //esri imagelayer
-            var imageLayer = new maptalks.esri.ImageMapLayer('imagemaplayer',{
-                renderer : 'gl',
-                // extent: [114.01135452865041,29.977598289839012,114.69833550031375,30.66457926150234],
-                extent: [extent.xmin, extent.ymin, extent.xmax, extent.ymax],
-                url: 'https://landsat.arcgis.com/arcgis/rest/services/Landsat/PS/ImageServer'
-            });
-            //
-            map.addLayer(imageLayer);
-        </script>
-    </body>
+<body>
+    <!--map document div-->
+    <div id='mapDiv' style="width:800px;height:600px;" class="container"> </div>
+    <script type="text/javascript">
+        // default map object
+        const center = gcoord.transform([-1.3074804281700876E7, 4015612.1628051093], gcoord.WebMercator, gcoord.WGS84);
+        var map = new maptalks.Map('mapDiv', {
+            center: center,
+            zoom: 16,
+            attribution: {
+                content: '&copy; <a href="http://osm.org">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/">CARTO</a>'
+            },
+            baseLayer: new maptalks.TileLayer('base', {
+                urlTemplate: 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+                subdomains: ['a', 'b', 'c', 'd']
+            })
+        });
+        var imageLayer = new maptalks.ImageLayer('imagemaplayer');
+        map.addLayer(imageLayer);
 
-    </html>
+        var service = new maptalks.esri.ImageLayerService({
+            url: 'https://sampleserver6.arcgisonline.com/arcgis/rest/services/PoolPermits/MapServer/export',
+            debug: true,
+            map,
+            // 数据的坐标系，不设置时则默认使用map的坐标系，如果设置，则会按该坐标系转换为map的坐标系
+            // projection: 'EPSG:3857',
+        });
+
+
+        function query() {
+            service.query().then(json => {
+                json = JSON.parse(json);
+                if (json.href) {
+                    const extent = map.getExtent();
+                    const geometry = [extent.xmin, extent.ymin, extent.xmax, extent.ymax];
+                    imageLayer.setImages([{
+                        url: json.href,
+                        extent: geometry
+                    }]);
+                }
+            })
+        }
+
+        map.on('viewchange', query);
+        query();
+    </script>
+</body>
+
+</html>
