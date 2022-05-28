@@ -9,7 +9,7 @@ class ExportImageTask extends Task{
 
     constructor(endpoint,params){
         super(endpoint,params);
-        this._path = 'exportImage'
+        // this._path = 'exportImage'
     }
 
     set params(value={}){

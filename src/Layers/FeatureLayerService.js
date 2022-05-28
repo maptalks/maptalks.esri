@@ -10,7 +10,7 @@ export default class FeatureService {
     constructor(options = {}) {
         this._options = options;
         this._url = options.url;
-        this._service = new FeatureQueryService(this._url);
+        this._service = new FeatureQueryService(this._url, options);
         this._projection = options.projection;
         if (maptalks.Util.isString(this._projection)); {
             this._projection = maptalks.SpatialReference.getProjectionInstance(options.projection);
@@ -50,7 +50,7 @@ export default class FeatureService {
     参考http://resources.arcgis.com/en/help/arcgis-rest-api/#/Add_Features/02r30000010m000000/
     * @ {Function} 添加要素后的回调方法
     */
-    addFeatures(features){
+    addFeatures(features) {
         return this._service.addFeatures(features).then(resp => {
             return JSON.parse(resp)
         });
@@ -60,7 +60,7 @@ export default class FeatureService {
      * @param {geojson} features格式可参考http://resources.arcgis.com/en/help/arcgis-rest-api/#/Add_Features/02r30000010m000000/
     * @ {Function} 更新要素后的回调方法
     */
-    updateFeatures(features){
+    updateFeatures(features) {
         return this._service.updateFeatures(features).then(resp => {
             return JSON.parse(resp)
         });
@@ -70,7 +70,7 @@ export default class FeatureService {
      * @param {Object} 指定删除的要素条件
     * @ {Function} 删除要素后的回调方法
     */
-    deleteFeatures(option){
+    deleteFeatures(option) {
         return this._service.deleteFeatures(option).then(resp => {
             return JSON.parse(resp);
         });
@@ -81,22 +81,22 @@ export default class FeatureService {
             return [];
         }
         const { features, geometryType: type } = data;
-        switch(type) {
+        switch (type) {
             case 'esriGeometryPoint':
-                  return this._createPoint(features);
+                return this._createPoint(features);
             case 'esriGeometryPolyline':
-                  return this._createLineString(features);
+                return this._createLineString(features);
             case 'esriGeometryPolygon':
-                  return this._createPolygon(features);
+                return this._createPolygon(features);
             default:
-                  break;
+                break;
         }
     }
 
     _createPoint(features) {
         const geometries = [];
         const symbol = this._options.symbol || null;
-        features.forEach(function(feature){
+        features.forEach(function (feature) {
             const coords = project(feature.geometry, this._projection);
             geometries.push(new maptalks.Marker(coords, {
                 symbol,
@@ -109,9 +109,9 @@ export default class FeatureService {
     _createLineString(features) {
         const geometries = [];
         const symbol = this._options.symbol || null;
-        features.forEach(function(feature){
+        features.forEach(function (feature) {
             const coords = project(feature.geometry.paths, this._projection);
-            geometries.push(new maptalks.MultiLineString(coords,{
+            geometries.push(new maptalks.MultiLineString(coords, {
                 properties: feature.attributes,
                 symbol
             }));
@@ -122,7 +122,7 @@ export default class FeatureService {
     _createPolygon(features) {
         const geometries = [];
         const symbol = this._options.symbol || null;
-        features.forEach(function(feature){
+        features.forEach(function (feature) {
             const coords = project(feature.geometry.rings, this._projection);
             geometries.push(new maptalks.Polygon(coords, {
                 properties: feature.attributes,
