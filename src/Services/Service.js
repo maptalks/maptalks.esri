@@ -67,8 +67,8 @@ class Service {
             if (hasService(this, queryId)) {
                 resolve(resp);
                 outService(this);
-            } else {
-                // console.warn(`${queryId} task is Discard`);
+            } else if (this._options['debug']) {
+                console.warn(`${queryId} task is Discard`);
             }
         };
         //4.根据method发出请求
