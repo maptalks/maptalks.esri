@@ -2,10 +2,11 @@
 import merge from './../Utils/merge';
 import cors from './../Utils/cors';
 import cleanUrl from './../Utils/cleanUrl';
-import { Ajax, Util } from 'maptalks';
+import { Ajax, Util, GeoJSON } from 'maptalks';
 import serializeParams from './../Utils/serializeParams';
 import Promise from './../Utils/Promise';
 import { hasService, outService, pushService } from '../servicequeryqueue';
+import { arcgisToGeoJSON } from "@terraformer/arcgis"
 
 const _options = {
     proxy: false,
@@ -95,6 +96,31 @@ class Service {
                 });
             });
         }
+    }
+
+    toGeometry(json) {
+        if (typeof json === 'string') {
+            json = JSON.parse(json);
+        }
+        const { spatialReference, features, results } = json;
+        const geojsonFeatures = [];
+        (features || results || []).forEach(feature => {
+            const { attributes, geometry } = feature;
+            if (!geometry) {
+                return;
+            }
+            const geometryGeoJSON = arcgisToGeoJSON(Util.extend({ spatialReference }, geometry));
+            if (geometryGeoJSON) {
+                geojsonFeatures.push({
+                    type: "Feature",
+                    geometry: geometryGeoJSON,
+                    properties: attributes
+                });
+            }
+        });
+        return geojsonFeatures.map(feature => {
+            return GeoJSON.toGeometry(feature);
+        });
     }
 }
 
