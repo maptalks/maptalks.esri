@@ -26,7 +26,7 @@ class Task {
      * 创建一个task，可以是基于url或者是service创建
      * @param {Service} service 
      */
-    constructor(service, options={}) {
+    constructor(service, options = {}) {
         /**
          * @type {Service}
          */
@@ -52,15 +52,19 @@ class Task {
     set formatted(boolean) {
         this._formatted = boolean;
     }
+
+    set params(value = {}) {
+        this._params = merge({}, this._params, value)
+    }
     /**
      * 提交request
      * @param {String} method set request method such as 'get' 'set'
      * @param {Object} params 
      * @returns {Promise}
      */
-    request(method,params) {
-        let _params = merge({}, this._params,params);
-        return this._service.request(method,this._path,_params); 
+    request(method, params) {
+        let _params = merge({}, this._params, params);
+        return this._service.request(method, this._path || '', _params);
     }
     /**
      * virtual function to be implemented by 

@@ -35,6 +35,10 @@ class Service {
         this.id = Util.GUID();
     }
 
+    getMap() {
+        return this._options.map;
+    }
+
     /**
      * 设置token，用于授权验证
      * @param {String} token 
