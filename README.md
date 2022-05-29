@@ -6,6 +6,7 @@ A plugin to load ArcGIS service.
 
 * [FeatureLayerService's Demo](https://maptalks.org/maptalks.esri/demo/FeatureLayer.html)
 * [ImageLayerService Demo](https://maptalks.org/maptalks.esri/demo/ImageLayer.html)
+* [IdentifyService Demo](https://maptalks.org/maptalks.esri/demo/identify.html)
 
 ## Install
 
@@ -63,6 +64,7 @@ function query() {
         geometry: geometry,
         geometryType: 'esriGeometryEnvelope'
     }).then(json => {
+        json = JSON.parse(json);
         console.log('fetures count:', json.features.length);
         const geometries = service.toGeometry(json);
         pointLayer.clear();
