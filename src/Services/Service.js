@@ -40,6 +40,12 @@ class Service {
         return this._options.map;
     }
 
+
+    getQueryTaskId() {
+        return `${Util.GUID()}_${new Date().getTime()}`;
+    }
+
+
     /**
      * 设置token，用于授权验证
      * @param {String} token 
@@ -63,13 +69,13 @@ class Service {
         method = method.toLowerCase();
 
         //current query 
-        const queryId = `${Util.GUID()}_${new Date().getTime()}`
+        const queryId = params.__queryId || this.getQueryTaskId();
         this.queryId = queryId;
         pushService(Util.extend({}, this));
 
         const resolveCallback = (resolve, resp) => {
             //不包含该次的查询，说明其已经被新的query替代无需 resolve
-            if (hasService(this, queryId)) {
+            if (hasService(this, queryId) || (this.queryInGrids && this.queryInGrids(queryId))) {
                 resolve(resp);
                 outService(this);
             } else if (this._options['debug']) {
