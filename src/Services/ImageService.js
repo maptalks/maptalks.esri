@@ -1,8 +1,7 @@
 
 import cors from './../Utils/cors';
 // import cleanUrl from './../Utils/cleanUrl';
-import { Util } from 'maptalks';
-import * as maptalks from 'maptalks';
+import { Util, Coordinate, Point } from 'maptalks';
 import Service from './Service';
 import IdentifyImageTask from './../Support/IdentifyImageTask';
 import MetadataTask from './../Support/MetadataTask';
@@ -10,9 +9,9 @@ import ExportImageTask from './../Support/ExportImageTask';
 
 
 // const TEMP_EXTENT = new maptalks.Extent();
-const TEMP_COORD = new maptalks.Coordinate(0, 0);
-const TEMP_POINT = new maptalks.Point(0, 0);
-const TEMP_POINT2 = new maptalks.Point(0, 0);
+const TEMP_COORD = new Coordinate(0, 0);
+const TEMP_POINT = new Point(0, 0);
+const TEMP_POINT2 = new Point(0, 0);
 const BBOX = [];
 /**
  * default ImageService options

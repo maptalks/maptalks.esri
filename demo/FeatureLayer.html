@@ -10,8 +10,6 @@
     <script src="https://unpkg.com/maptalks/dist/maptalks.js"></script>
     <!-- maptalks.esri -->
     <script src="https://unpkg.com/maptalks.esri/dist/maptalks.esri.js"></script>
-    <script src="https://unpkg.com/@maptalks/gl/dist/maptalksgl.js"></script>
-    <script src="https://unpkg.com/@maptalks/vt/dist/maptalks.vt.js"></script>
 </head>
 
 <body>
@@ -20,8 +18,8 @@
     <script type="text/javascript">
         // default map object
         var map = new maptalks.Map('mapDiv', {
-            center: [66.06970110501516, 35.542725505590255],
-            zoom: 6,
+            center: [10.111249249271737, 26.553938666233677],
+            zoom: 2,
             attribution: {
                 content: '&copy; <a href="http://osm.org">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/">CARTO</a>'
             },
@@ -46,14 +44,15 @@
             }
         });
 
-        const pointLayer = new maptalks.PointLayer('polygon');
-        const groupLayer = new maptalks.GroupGLLayer('group', [pointLayer]).addTo(map);
+        const pointLayer = new maptalks.VectorLayer('polygon').addTo(map);
         function query() {
             const extent = map.getExtent();
             const geometry = [extent.xmin, extent.ymin, extent.xmax, extent.ymax].join(',');
             service.query({
                 geometry: geometry,
-                geometryType: 'esriGeometryEnvelope'
+                geometryType: 'esriGeometryEnvelope',
+                //quarter extent to grids ,It can solve the limitation of data returned by ArcGIS Server
+                gridQuery: true
             }).then(json => {
                 json = JSON.parse(json);
                 console.log('fetures count:', json.features.length);
@@ -61,12 +60,12 @@
                 geometries.forEach(geometry => {
                     geometry.setSymbol({
                         markerType: 'ellipse',
-                        markerWidth: 12,
-                        markerHeight: 12,
+                        markerWidth: 8,
+                        markerHeight: 8,
                         markerFill: '#f00',
                         markerFillOpacity: 0.5,
-                        markerLineColor: '#000',
-                        markerLineWidth: 2
+                        markerLineColor: '#fff',
+                        markerLineWidth: 1
                     })
                 });
                 pointLayer.clear();
