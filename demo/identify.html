@@ -10,7 +10,7 @@
     <script src="https://unpkg.com/maptalks/dist/maptalks.js"></script>
     <script src="https://unpkg.com/gcoord@0.3.2/dist/gcoord.js"></script>
     <!-- maptalks.esri -->
-    <script src="../dist/maptalks.esri.js"></script>
+    <script src="https://unpkg.com/maptalks.esri/dist/maptalks.esri.js"></script>
 </head>
 
 <body>
@@ -49,8 +49,9 @@
             }).then(json => {
                 json = JSON.parse(json);
                 console.log('fetures count:', json.results.length);
-                const geometries = json.results.map(d => {
-                    return createGeometry(d);
+                const geometries = service.toGeometry(json);
+                geometries.forEach(geometry => {
+                    updateSymbol(geometry);
                 });
                 layer.clear();
                 layer.addGeometry(geometries);
@@ -60,32 +61,30 @@
         map.on('click', query);
 
 
-        function createGeometry(d) {
-            const { geometry, geometryType: type } = d;
-            let geom;
-            switch (type) {
-                case 'esriGeometryPoint':
-                    return new maptalks.Marker(geometry);
-                case 'esriGeometryPolyline':
-                    var symbol = {
-                        lineColor: 'red'
-                    }
-                    if (Array.isArray(geometry.paths[0][0])) {
-                        geom = new maptalks.MultiLineString(geometry.paths, { symbol });
-                    } else {
-                        geom = new maptalks.LineString(geometry.paths, { symbol });
-                    }
-                    break;
-                case 'esriGeometryPolygon':
-                    var symbol = {
-                        polygonFill: 'blue'
-                    }
-                    geom = new maptalks.MultiPolygon([geometry.rings], { symbol });
-                default:
-                    break;
+        function updateSymbol(geometry) {
+            const type = geometry.getType();
+            if (type.includes('Point')) {
+                geometry.setSymbol({
+                    markerType: 'ellipse',
+                    markerWidth: 12,
+                    markerHeight: 12,
+                    markerFill: '#f00',
+                    markerFillOpacity: 0.5,
+                    markerLineColor: '#000',
+                    markerLineWidth: 2
+                })
             }
-            console.log(geom);
-            return geom;
+            if (type.includes('LineString')) {
+                geometry.setSymbol({
+                    lineColor: 'red'
+                })
+            }
+            if (type.includes('Polygon')) {
+                geometry.setSymbol({
+                    polygonFill: 'blue',
+                    polygonOpacity: 0.5
+                })
+            }
         }
     </script>
 </body>
