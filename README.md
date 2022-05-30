@@ -5,6 +5,7 @@ A plugin to load ArcGIS service.
 ## Demo
 
 * [FeatureLayerService's Demo](https://maptalks.org/maptalks.esri/demo/FeatureLayer.html)
+* [FeatureLayerService Dynamic Condition Demo](https://maptalks.org/maptalks.esri/demo/FeatureLayer-where.html)
 * [ImageLayerService Demo](https://maptalks.org/maptalks.esri/demo/ImageLayer.html)
 * [IdentifyService Demo](https://maptalks.org/maptalks.esri/demo/identify.html)
 * [DynamicMapLayer Demo](https://maptalks.org/maptalks.esri/demo/DynamicMapLayer.html)
