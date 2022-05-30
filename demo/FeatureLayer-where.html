@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>FeatureLayerService</title>
+    <!-- maptalks -->
+    <script src="https://unpkg.com/maptalks/dist/maptalks.js"></script>
+    <!-- maptalks.esri -->
+    <script src="https://unpkg.com/maptalks.esri/dist/maptalks.esri.js"></script>
+</head>
+
+<body>
+    <!--map document div-->
+    <!-- https://developers.arcgis.com/esri-leaflet/samples/querying-feature-layers-1/ -->
+    <div id="query" class="leaflet-bar">
+        <label>
+            Zoning District:
+            <select id="district">
+                <!-- make sure to encase string values in single quotes for valid sql -->
+                <option value="1=1">Any</option>
+                <option value="ZONE_SMRY='OPEN SPACE'">Open Space</option>
+                <option value="ZONE_SMRY='AGRICULTURE'">Agriculture</option>
+                <option value="ZONE_SMRY='RESIDENTIAL'">Residential</option>
+                <option value="ZONE_SMRY='COMMERCIAL'">Commercial</option>
+                <option value="ZONE_SMRY='INDUSTRIAL'">Industrial</option>
+                <option value="ZONE_SMRY='PARKING'">Parking</option>
+                <option value="ZONE_SMRY='PUBLIC FACILITY'">Public Facility</option>
+            </select>
+        </label>
+    </div>
+    <div id='mapDiv' style="width:800px;height:600px;" class="container"> </div>
+    <script type="text/javascript">
+        // default map object
+        var map = new maptalks.Map('mapDiv', {
+            center: [-118.53, 34.19],
+            zoom: 15,
+            attribution: {
+                content: '&copy; <a href="http://osm.org">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/">CARTO</a>'
+            },
+            baseLayer: new maptalks.TileLayer('base', {
+                urlTemplate: 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+                subdomains: ['a', 'b', 'c', 'd']
+            })
+        });
+        var service = new maptalks.esri.FeatureLayerService({
+            url: 'https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/TEST_PYTHON_ZONING/FeatureServer/0',
+            debug: true,
+            // 数据的坐标系，不设置时则默认使用map的坐标系，如果设置，则会按该坐标系转换为map的坐标系
+            // projection: 'EPSG:3857',
+            symbol: {
+                markerType: 'ellipse',
+                markerWidth: 12,
+                markerHeight: 12,
+                markerFill: '#f00',
+                markerFillOpacity: 0.5,
+                markerLineColor: '#000',
+                markerLineWidth: 2
+            }
+        });
+        const zoningDistrict = document.getElementById("district");
+
+        const pointLayer = new maptalks.VectorLayer('polygon').addTo(map);
+        function query() {
+            const extent = map.getExtent();
+            const geometry = [extent.xmin, extent.ymin, extent.xmax, extent.ymax].join(',');
+            service.query({
+                geometry: geometry,
+                geometryType: 'esriGeometryEnvelope',
+                //quarter extent to grids ,It can solve the limitation of data returned by ArcGIS Server
+                gridQuery: true,
+                inSR: 4326,
+                outSR: 4326,
+                where: zoningDistrict.value
+            }).then(json => {
+                json = JSON.parse(json);
+                console.log('fetures count:', json.features.length);
+                const geometries = service.toGeometry(json);
+                geometries.forEach(geometry => {
+                    updateSymbol(geometry);
+                });
+                pointLayer.clear();
+                pointLayer.addGeometry(geometries);
+                // map.setCenterAndZoom(extent.getCenter(), zoom);
+            });
+        }
+        query();
+        map.on('viewchange', query);
+
+        zoningDistrict.addEventListener("change", function () {
+            query();
+        });
+
+        function updateSymbol(geometry) {
+            const type = geometry.getType();
+            if (type.includes('Point')) {
+                geometry.setSymbol({
+                    markerType: 'ellipse',
+                    markerWidth: 12,
+                    markerHeight: 12,
+                    markerFill: '#f00',
+                    markerFillOpacity: 0.5,
+                    markerLineColor: '#000',
+                    markerLineWidth: 2
+                })
+            }
+            if (type.includes('LineString')) {
+                geometry.setSymbol({
+                    lineColor: 'red'
+                })
+            }
+            if (type.includes('Polygon')) {
+                geometry.setSymbol({
+                    polygonFill: 'blue',
+                    polygonOpacity: 0.5
+                })
+            }
+        }
+    </script>
+</body>
+
+</html>

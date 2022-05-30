@@ -107,7 +107,7 @@ export default class ImageService extends Service {
         //强制要求是4326
         const code = projection.code;
         params.imageSR = options.imageSR || code.substring('EPSG:'.length);
-        return params;
+        return Util.extend({}, params, options);
     }
     /**
      * 获取配置信息，用于设置加载位置等
