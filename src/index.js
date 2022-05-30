@@ -6,5 +6,6 @@ import FeatureLayerService from './Services/FeatureService';
 import ImageLayerService from './Services/ImageService';
 import GeometryService from './Services/GeometryService';
 import IdentifyService from './Services/IdentifyService';
+import DynamicMapLayerService from './Services/DynamicMapService';
 
-export { ImageMapLayer, FeatureLayerService, GeometryService, ImageLayerService, IdentifyService }
+export { ImageMapLayer, FeatureLayerService, GeometryService, ImageLayerService, IdentifyService, DynamicMapLayerService }
