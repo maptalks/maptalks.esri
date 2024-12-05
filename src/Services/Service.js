@@ -4,7 +4,6 @@ import cors from './../Utils/cors';
 import cleanUrl from './../Utils/cleanUrl';
 import { Ajax, Util, GeoJSON } from 'maptalks';
 import serializeParams from './../Utils/serializeParams';
-import Promise from './../Utils/Promise';
 import { hasService, outService, pushService } from '../servicequeryqueue';
 import { arcgisToGeoJSON } from "@terraformer/arcgis"
 
@@ -23,7 +22,7 @@ const _options = {
  */
 class Service {
     /**
-     * 
+     *
      * @param {Object} options
      * @param {String} options.url
      * @param {boolean} [options.proxy] defalut is false
@@ -48,7 +47,7 @@ class Service {
 
     /**
      * 设置token，用于授权验证
-     * @param {String} token 
+     * @param {String} token
      */
     authenticate(token) {
         this._token = token;
@@ -56,8 +55,8 @@ class Service {
     /**
      * send a request to fetch data
      * @param {String} method set 'get' or 'post' to request data
-     * @param {String} path  
-     * @param {Object} params 
+     * @param {String} path
+     * @param {Object} params
      * @returns {Promise}
      */
     request(method, path, params) {
@@ -68,7 +67,7 @@ class Service {
         //3.发出请求
         method = method.toLowerCase();
 
-        //current query 
+        //current query
         const queryId = params.__queryId || this.getQueryTaskId();
         this.queryId = queryId;
         pushService(Util.extend({}, this));

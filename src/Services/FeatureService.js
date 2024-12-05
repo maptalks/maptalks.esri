@@ -6,7 +6,6 @@ import QueryTask from './../Support/QueryTask';
 import FeaturesTask from './../Support/FeaturesTask';
 import { Util } from 'maptalks';
 import { outService } from '../servicequeryqueue';
-import Promise from './../Utils/Promise';
 
 /**
  * default ImageService options
@@ -107,9 +106,9 @@ export default class FeatureService extends Service {
     }
 
     /**
-     * 
-     * @param {*} extent 
-     * @returns 
+     *
+     * @param {*} extent
+     * @returns
      */
     quarterExtent(extent) {
         const [xmin, ymin, xmax, ymax] = extent.split(',').map(number => {
